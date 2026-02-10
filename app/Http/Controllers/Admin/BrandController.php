@@ -63,12 +63,22 @@ public function store(Request $request)
 
         $brand->update($request->all());
 
-        return redirect()->route('brands.index')->with('success', 'Brand updated!');
+        try {
+            return redirect()->route('brands.index')->with('success', 'Brand updated successfully!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Something went wrong while updating.');
+        }
+
     }
 
     public function destroy(Brand $brand)
     {
         $brand->delete();
-        return redirect()->route('brands.index')->with('info', 'Brand moved to trash.');
+        
+        try {
+            return redirect()->route('brands.index')->with('success', 'Brand deleted successfully!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Something went wrong while deleting.');
+        }
     }   
 }
