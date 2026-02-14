@@ -15,11 +15,11 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ request()->is('admin/categories*') ? 'active' : '' }}" 
-                       href="#">Categories</a>
+                       href="{{ route('categories.index') }}">Categories</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ request()->is('admin/products*') ? 'active' : '' }}" 
-                       href="#">Products</a>
+                       href="{{ route('products.index') }}">Products</a>
                 </li>
                 <li class="nav-item ms-lg-3">
                     <a class="btn btn-outline-light btn-sm mt-1" href="#">Logout</a>
