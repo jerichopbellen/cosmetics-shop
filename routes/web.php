@@ -18,3 +18,6 @@ Route::resource('admin/products', ProductController::class);
 
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/product/{product}', [ShopController::class, 'show'])->name('shop.show');
+
+Route::post('/cart/add', [ShopController::class, 'addToCart'])->name('cart.add');
+Route::get('/cart', [ShopController::class, 'viewCart'])->name('cart.index');
