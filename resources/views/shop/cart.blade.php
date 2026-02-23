@@ -20,12 +20,11 @@
                         </thead>
                         <tbody>
                             @php $total = 0 @endphp
-                            @foreach(session('cart') as $id => $details)
-                                @php $total += $details['price'] * $details['quantity'] @endphp
+                            @foreach(session('cart') as $key => $details)
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <img src="{{ asset('storage/' . $details['image']) }}" width="60" height="60" class="rounded me-3 border">
+                                            <img src="{{ asset('storage/' . $details['image']) }}" width="60" class="rounded me-3 border">
                                             <div>
                                                 <div class="fw-bold">{{ $details['product_name'] }}</div>
                                                 <small class="text-muted">Shade: {{ $details['shade_name'] }}</small>
@@ -35,7 +34,15 @@
                                     <td>${{ number_format($details['price'], 2) }}</td>
                                     <td>{{ $details['quantity'] }}</td>
                                     <td>${{ number_format($details['price'] * $details['quantity'], 2) }}</td>
-                                    <td><button class="btn btn-sm btn-outline-danger"><i class="fa fa-trash"></i></button></td>
+                                    <td>
+                                        <form action="{{ route('cart.remove', $key) }}" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>

@@ -80,4 +80,16 @@ class ShopController extends Controller
     {
         return view('shop.cart');
     }
+
+    public function removeFromCart($key)
+    {
+        $cart = session()->get('cart');
+
+        if(isset($cart[$key])) {
+            unset($cart[$key]);
+            session()->put('cart', $cart);
+        }
+
+        return redirect()->back()->with('success', 'Item removed from cart.');
+    }
 }

@@ -24,6 +24,7 @@ Route::get('/product/{product}', [ShopController::class, 'show'])->name('shop.sh
 // 2. Shopping Cart (Session-based, usually public)
 Route::get('/cart', [ShopController::class, 'viewCart'])->name('cart.index');
 Route::post('/cart/add', [ShopController::class, 'addToCart'])->name('cart.add');
+Route::delete('/cart/remove/{key}', [ShopController::class, 'removeFromCart'])->name('cart.remove');
 
 // 3. Customer Routes (Must be logged in to checkout)
 Route::middleware(['auth'])->group(function () {
