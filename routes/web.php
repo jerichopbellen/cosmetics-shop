@@ -17,9 +17,6 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // 1. Public Routes (Anyone can see)
-Route::get('/', function () {
-    return view('welcome');
-});
 
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/product/{product}', [ShopController::class, 'show'])->name('shop.show');
