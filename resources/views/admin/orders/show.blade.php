@@ -91,12 +91,6 @@
                             </select>
                         </div>
 
-                        <div class="mb-4">
-                            <label class="form-label small text-uppercase opacity-75">Tracking Number</label>
-                            <input type="text" name="tracking_id" class="form-control bg-secondary border-0 text-white shadow-none" 
-                                   value="{{ $order->tracking_id }}" placeholder="e.g. DHL-12345">
-                        </div>
-
                         <button type="submit" class="btn btn-light w-100 fw-bold py-2">
                             Save Changes
                         </button>

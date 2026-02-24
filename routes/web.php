@@ -28,6 +28,7 @@ Route::delete('/cart/remove/{key}', [ShopController::class, 'removeFromCart'])->
 Route::middleware(['auth'])->group(function () {
     Route::get('/checkout', [ShopController::class, 'checkout'])->name('checkout.index');
     Route::post('/checkout', [ShopController::class, 'processCheckout'])->name('checkout.store');
+    Route::get('/checkout/success/{order_number}', [ShopController::class, 'success'])->name('checkout.success');
 });
 
 Route::middleware(['auth', 'admin'])
@@ -38,5 +39,4 @@ Route::middleware(['auth', 'admin'])
         Route::resource('products', ProductController::class);
         Route::get('/orders', [OrderController::class, 'index'])->name('admin.orders.index');
         Route::get('/orders/{order}', [OrderController::class, 'show'])->name('admin.orders.show');
-        Route::put('/orders/{order}', [OrderController::class, 'update'])->name('admin.orders.update');
-    });
+        Route::put('/orders/{order}', [OrderController::class, 'update'])->name('admin.orders.update');    });

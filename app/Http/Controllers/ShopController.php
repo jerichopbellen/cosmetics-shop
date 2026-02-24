@@ -111,31 +111,39 @@ class ShopController extends Controller
 
     public function processCheckout(Request $request)
     {
+        // 1. Validate the shipping data from your new blade
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'required|string',
+            'phone' => 'required|string',
+            'city' => 'required|string',
+            'payment_method' => 'required'
+        ]);
+
         $cart = session()->get('cart');
+        if (!$cart) return redirect()->route('shop.index');
 
-        if (!$cart) {
-            return redirect()->route('shop.index');
-        }
-
-        // Wrap in a transaction to ensure data integrity
         DB::beginTransaction();
 
         try {
-            // 1. Create the Main Order
+            // 2. Create the Order with shipping details
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'order_number' => 'GLOW-' . strtoupper(Str::random(10)),
                 'total_amount' => collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']),
                 'status' => 'Pending',
+                'address' => $request->address,
+                'phone' => $request->phone,
+                'city' => $request->city,
+                'payment_method' => $request->payment_method,
             ]);
 
-            // 2. Create Order Items & Deduct Stock
+            // 3. Create Items & Deduct Stock
             foreach ($cart as $item) {
-                // Find the shade and lock the row for update to prevent overselling
                 $shade = Shade::where('id', $item['shade_id'])->lockForUpdate()->first();
 
                 if (!$shade || $shade->stock < $item['quantity']) {
-                    throw new \Exception("Sorry, " . $item['product_name'] . " (" . $item['shade_name'] . ") just went out of stock.");
+                    throw new \Exception("Item " . $item['product_name'] . " is no longer available.");
                 }
 
                 OrderItem::create([
@@ -145,18 +153,47 @@ class ShopController extends Controller
                     'price'    => $item['price'],
                 ]);
 
-                // Deduct the stock
                 $shade->decrement('stock', $item['quantity']);
             }
 
             DB::commit();
             session()->forget('cart');
 
-            return redirect()->route('shop.index')->with('success', 'Order placed! Your order number is: ' . $order->order_number);
+            // Redirect to a success page (we will build this next)
+            return redirect()->route('checkout.success', $order->order_number);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('cart.index')->with('error', $e->getMessage());
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function success($order_number)
+    {
+        return view('shop.success', compact('order_number'));
+    }
+
+    public function update(Request $request, Order $order)
+    {
+        // 1. Validate only the status
+        $validated = $request->validate([
+            'status' => 'required|in:Pending,Packing,Shipped,Delivered,Cancelled',
+        ]);
+
+        try {
+            // 2. Update only the status field
+            $order->update([
+                'status' => $validated['status'],
+            ]);
+
+            return redirect()
+                ->route('admin.orders.show', $order->id)
+                ->with('success', "Order status updated to {$validated['status']}.");
+
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Failed to update order status.');
         }
     }
 }
