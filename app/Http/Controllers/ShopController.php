@@ -5,6 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Models\Shade;
+use App\Models\Order;
+use App\Models\OrderItem;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class ShopController extends Controller
 {
@@ -23,7 +28,7 @@ class ShopController extends Controller
             });
         }
 
-        $products = $query->latest()->paginate(12);
+        $products = $query->latest()->simplePaginate(12);
 
         return view('shop.index', compact('products'));
     }
@@ -91,5 +96,67 @@ class ShopController extends Controller
         }
 
         return redirect()->back()->with('success', 'Item removed from cart.');
+    }
+
+    public function checkout()
+    {
+        $cart = session()->get('cart');
+        
+        if (!$cart || count($cart) == 0) {
+            return redirect()->route('shop.index')->with('error', 'Your cart is empty.');
+        }
+
+        return view('shop.checkout', compact('cart'));
+    }
+
+    public function processCheckout(Request $request)
+    {
+        $cart = session()->get('cart');
+
+        if (!$cart) {
+            return redirect()->route('shop.index');
+        }
+
+        // Wrap in a transaction to ensure data integrity
+        DB::beginTransaction();
+
+        try {
+            // 1. Create the Main Order
+            $order = Order::create([
+                'user_id' => Auth::id(),
+                'order_number' => 'GLOW-' . strtoupper(Str::random(10)),
+                'total_amount' => collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']),
+                'status' => 'Pending',
+            ]);
+
+            // 2. Create Order Items & Deduct Stock
+            foreach ($cart as $item) {
+                // Find the shade and lock the row for update to prevent overselling
+                $shade = Shade::where('id', $item['shade_id'])->lockForUpdate()->first();
+
+                if (!$shade || $shade->stock < $item['quantity']) {
+                    throw new \Exception("Sorry, " . $item['product_name'] . " (" . $item['shade_name'] . ") just went out of stock.");
+                }
+
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'shade_id' => $item['shade_id'],
+                    'quantity' => $item['quantity'],
+                    'price'    => $item['price'],
+                ]);
+
+                // Deduct the stock
+                $shade->decrement('stock', $item['quantity']);
+            }
+
+            DB::commit();
+            session()->forget('cart');
+
+            return redirect()->route('shop.index')->with('success', 'Order placed! Your order number is: ' . $order->order_number);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('cart.index')->with('error', $e->getMessage());
+        }
     }
 }
