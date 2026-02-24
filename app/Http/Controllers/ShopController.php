@@ -196,4 +196,25 @@ class ShopController extends Controller
                 ->with('error', 'Failed to update order status.');
         }
     }
+
+    public function myOrders()
+    {
+        // Check if user is logged in to avoid errors
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
+        $orders = Order::where('user_id', Auth::id())
+            ->with([
+                'orderItems.shade.product.images', 
+                'orderItems.shade.product.brand'
+            ])
+            ->latest()
+            ->get();
+
+        $currentOrders = $orders->whereIn('status', ['Pending', 'Packing', 'Shipped']);
+        $orderHistory = $orders->whereIn('status', ['Delivered', 'Cancelled']);
+
+        return view('shop.my-orders', compact('currentOrders', 'orderHistory'));
+    }
 }

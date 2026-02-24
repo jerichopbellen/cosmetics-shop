@@ -48,6 +48,12 @@
                     </a>
                 </li>
 
+                <li>
+                    <a class="nav-link position-relative py-lg-0" href="{{ route('orders.my') }}">
+                        <i class="fa-solid fa-list fa-lg"></i>
+                    </a>
+                </li>
+
                 @auth
                     <li class="nav-item ms-lg-3">
                         <form action="{{ route('logout') }}" method="POST" class="d-inline">
