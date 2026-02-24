@@ -30,6 +30,10 @@
                         <a class="nav-link {{ request()->is('admin/products*') ? 'active' : '' }}" 
                            href="{{ route('products.index') }}">Products</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->is('admin/orders*') ? 'active' : '' }}" 
+                           href="{{ route('admin.orders.index') }}">Orders</a>
+                    </li>
                 @endif
 
                 <li class="nav-item ms-lg-3">
