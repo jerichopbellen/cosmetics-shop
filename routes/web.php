@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\AuthController;
 
@@ -40,4 +41,9 @@ Route::middleware(['auth', 'admin'])
         Route::resource('products', ProductController::class);
         Route::get('/orders', [OrderController::class, 'index'])->name('admin.orders.index');
         Route::get('/orders/{order}', [OrderController::class, 'show'])->name('admin.orders.show');
-        Route::put('/orders/{order}', [OrderController::class, 'update'])->name('admin.orders.update');    });
+        Route::put('/orders/{order}', [OrderController::class, 'update'])->name('admin.orders.update');    
+        Route::get('/users', [UserController::class, 'index'])->name('admin.users.index');
+        Route::get('/users/{user}', [UserController::class, 'show'])->name('admin.users.show');
+        Route::patch('/users/{user}/role', [UserController::class, 'updateRole'])->name('admin.users.updateRole');
+
+});
