@@ -19,7 +19,7 @@ Route::middleware('guest')->group(function () {
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
-Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
+Route::get('/', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/product/{product}', [ShopController::class, 'show'])->name('shop.show');
 
 Route::get('/cart', [ShopController::class, 'viewCart'])->name('cart.index');
