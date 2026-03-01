@@ -112,7 +112,7 @@
                     <i class="fa-solid fa-cart-shopping fa-4x text-pink opacity-25"></i>
                 </div>
                 <h4 class="fw-bold">Your cart is empty</h4>
-                <p class="text-muted mb-4">Don't let your jewelry box go empty! Discover our latest pieces.</p>
+                <p class="text-muted mb-4">Don't let your makeup kit go empty! Discover our latest products.</p>
                 <a href="{{ route('shop.index') }}" class="btn btn-pink px-5 py-2 fw-bold">
                     START SHOPPING
                 </a>
