@@ -87,22 +87,4 @@
         {{ $products->links() }}
     </div>
 </div>
-
-<style>
-    /* Simple Border Transition */
-    .product-card {
-        border: 1px solid transparent !important;
-        transition: all 0.2s ease-in-out;
-    }
-
-    .product-card:hover {
-        border-color: #ec4899 !important;
-        box-shadow: 0 5px 15px rgba(236, 72, 153, 0.1) !important;
-    }
-
-    /* Transition helper */
-    .transition-all {
-        transition: all 0.2s ease-in-out;
-    }
-</style>
 @endsection

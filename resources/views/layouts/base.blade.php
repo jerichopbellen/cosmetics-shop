@@ -134,7 +134,19 @@
             background-color: #ec4899;
             border-color: #ec4899;
         }
-  
+            .product-card {
+        border: 1px solid transparent !important;
+        transition: all 0.2s ease-in-out;
+        }
+
+        .product-card:hover {
+            border-color: #ec4899 !important;
+            box-shadow: 0 5px 15px rgba(236, 72, 153, 0.1) !important;
+        }
+        .transition-all {
+            transition: all 0.2s ease-in-out;
+        }
+    
     </style>
 </head>
 
