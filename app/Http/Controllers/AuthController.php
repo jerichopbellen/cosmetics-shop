@@ -49,7 +49,7 @@ class AuthController extends Controller
             if (Auth::user()->role === 'admin') {
                 return redirect()->intended('/admin/products');
             }
-            return redirect()->intended('/shop');
+            return redirect()->intended('/');
         }
 
         return back()->withErrors(['email' => 'The provided credentials do not match our records.']);
@@ -61,6 +61,6 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/shop');
+        return redirect('/');
     }
 }

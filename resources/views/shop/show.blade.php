@@ -34,7 +34,7 @@
             <p class="text-muted mb-3">Brand: <span class="text-dark fw-bold">{{ $product->brand->name }}</span></p>
             
             <div class="d-flex align-items-center gap-3 mb-4">
-                <h2 class="text-primary fw-bold mb-0" id="dynamic-price">
+                <h2 class="fw-bold mb-0 text-pink" id="dynamic-price">
                     ${{ number_format($firstShade->price, 2) }}
                 </h2>
                 <span id="stock-status" class="badge {{ $firstShade->stock > 0 ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} px-3 py-2">
@@ -71,14 +71,14 @@
                     <div class="col-auto">
                         <label class="fw-bold small d-block mb-2">Quantity</label>
                         <div class="input-group" style="width: 140px;">
-                            <button class="btn btn-outline-dark" type="button" onclick="stepQuantity(-1)">-</button>
-                            <input type="number" name="quantity" id="quantity-input" class="form-control text-center border-dark" value="1" min="1" max="{{ $firstShade->stock }}">
-                            <button class="btn btn-outline-dark" type="button" onclick="stepQuantity(1)">+</button>
+                            <button class="btn btn-outline-pink" type="button" onclick="stepQuantity(-1)">-</button>
+                            <input type="number" name="quantity" id="quantity-input" class="form-control text-center border-pink" value="1" min="1" max="{{ $firstShade->stock }}">
+                            <button class="btn btn-outline-pink" type="button" onclick="stepQuantity(1)">+</button>
                         </div>
                     </div>
                     <div class="col">
                         <label class="d-block mb-2">&nbsp;</label>
-                        <button type="submit" id="add-to-cart-btn" class="btn btn-dark btn-lg w-100 py-3 shadow-sm" {{ $firstShade->stock <= 0 ? 'disabled' : '' }}>
+                        <button type="submit" id="add-to-cart-btn" class="btn btn-pink btn-lg w-100 py-3 shadow-sm" {{ $firstShade->stock <= 0 ? 'disabled' : '' }}>
                             <i class="fas fa-shopping-cart me-2"></i> Add to Cart
                         </button>
                     </div>
@@ -99,33 +99,6 @@
         </div>
     </div>
 </div>
-
-<style>
-    .shade-swatch {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        cursor: pointer;
-        border: 3px solid #fff;
-        box-shadow: 0 0 0 1px #ddd;
-        transition: all 0.2s ease-in-out;
-    }
-    .shade-swatch.active {
-        box-shadow: 0 0 0 2px #000;
-        transform: scale(1.15);
-    }
-    .thumb-select:hover {
-        border-color: #000;
-        opacity: 0.8;
-    }
-    .custom-scrollbar::-webkit-scrollbar {
-        height: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #ddd;
-        border-radius: 10px;
-    }
-</style>
 
 @push('scripts')
 <script>

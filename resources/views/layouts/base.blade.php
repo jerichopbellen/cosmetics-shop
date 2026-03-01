@@ -32,6 +32,110 @@
 
     @show
 
+    <style>
+        .text-pink {
+            color: #ec4899;
+        }
+        .btn-pink {
+            background-color: #ec4899;
+            border-color: #ec4899;
+            color: white;
+        }
+        .btn-pink:hover {
+            background-color: #db2777;
+            border-color: #db2777;
+            color: white;
+        }
+        .btn-outline-pink {
+            color: #ec4899;
+            border-color: #ec4899;
+        }
+        .btn-outline-pink:hover {
+            background-color: #ec4899;
+            border-color: #ec4899;
+            color: white;
+        }
+        .border-pink {
+            border-color: #ec4899 !important;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #ddd;
+            border-radius: 10px;
+
+        }
+        .shade-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid #fff;
+            box-shadow: 0 0 0 1px #ddd;
+            transition: all 0.2s ease-in-out;
+        }
+        .shade-swatch.active {
+            box-shadow: 0 0 0 2px #ec4899;
+            transform: scale(1.15);
+        }
+        .thumb-select:hover {
+            border-color: #ec4899;
+            opacity: 0.8;
+        }
+        /* Reset Bootstrap Defaults to GLOW Theme */
+        .nav-tabs .nav-link {
+            border: none;
+            color: #6c757d; /* Muted grey for ALL inactive tabs */
+            transition: all 0.2s ease;
+        }
+        /* Only the active tab gets the pink treatment */
+        .nav-tabs .nav-link.active {
+            color: #ec4899 !important;
+            border-bottom: 3px solid #ec4899 !important;
+            background: none !important;
+            font-weight: bold;
+        }
+        .nav-tabs .nav-link:hover {
+            color: #ec4899;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: #ec4899 !important;
+        border-color: #ec4899 !important;
+        color: white !important;
+        border-radius: 5px;
+        }
+        
+        table.dataTable thead th {
+            border-bottom: 2px solid #f9a8d4 !important; /* Light pink header border */
+            color: #6c757d;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Subtle pink glow on row hover */
+        .table-hover tbody tr:hover {
+            background-color: #fff1f2 !important; 
+        }
+        .group:hover .border-bottom-hover {
+            text-decoration: underline;
+            color: #ec4899 !important;
+        }
+        .group:hover .bg-pink {
+            background-color: #be185d !important; /* Slightly darker pink on hover */
+        }
+        .border-pink-focus:focus {
+            border-color: #ec4899;
+            box-shadow: 0 0 0 0.25rem rgba(236, 72, 153, 0.1);
+        }
+        .form-check-input:checked {
+            background-color: #ec4899;
+            border-color: #ec4899;
+        }
+  
+    </style>
 </head>
 
 <body class="d-flex flex-column min-vh-100 bg-light">

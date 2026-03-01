@@ -76,10 +76,10 @@
                             
                             <div class="d-flex justify-content-between h4 fw-bold mt-3 border-top pt-3">
                                 <span>Total</span>
-                                <span class="text-primary">${{ number_format($subtotal, 2) }}</span>
+                                <span style="color: #ec4899;">${{ number_format($subtotal, 2) }}</span>
                             </div>
 
-                            <button type="submit" class="btn btn-dark btn-lg w-100 mt-4 py-3 fw-bold">
+                            <button type="submit" class="btn btn-lg w-100 mt-4 py-3 fw-bold" style="background-color: #ec4899; border-color: #ec4899; color: white;">
                                 PLACE ORDER NOW
                             </button>
                             <p class="text-muted small text-center mt-3">
