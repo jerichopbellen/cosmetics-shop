@@ -10,60 +10,44 @@
         <div class="collapse navbar-collapse" id="glowNavbar">
             <ul class="navbar-nav ms-auto align-items-lg-center">
                 <li class="nav-item">
-                    <a class="nav-link text-dark {{ request()->is('shop*') ? 'active-nav' : '' }}" 
-                       href="{{ route('shop.index') }}">Shop</a>
-                </li>
-
-                @if(auth()->check() && auth()->user()->role === 'admin')
-                    <li class="nav-item ms-lg-2 border-start ps-lg-3 border-secondary" style="border-color: rgba(0,0,0,0.1) !important;">
-                        <small class="text-dark d-none d-lg-block fw-bold opacity-75" style="font-size: 0.7rem;">ADMIN</small>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark {{ request()->is('admin/brands*') ? 'active-nav' : '' }}" 
-                           href="{{ route('brands.index') }}">Brands</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark {{ request()->is('admin/categories*') ? 'active-nav' : '' }}" 
-                           href="{{ route('categories.index') }}">Categories</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark {{ request()->is('admin/products*') ? 'active-nav' : '' }}" 
-                           href="{{ route('products.index') }}">Products</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark {{ request()->is('admin/orders*') ? 'active-nav' : '' }}" 
-                           href="{{ route('admin.orders.index') }}">Orders</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark {{ request()->is('admin/users*') ? 'active-nav' : '' }}" 
-                           href="{{ route('admin.users.index') }}">Users</a>
-                    </li>
-                @endif
-
-                <li class="nav-item ms-lg-3">
-                    <a class="nav-link text-dark position-relative py-lg-0 {{ request()->is('cart*') ? 'active-nav' : '' }}" href="{{ route('cart.index') }}">
-                        <i class="fa-solid fa-cart-shopping fa-lg"></i>
-                        @if(session('cart') && count(session('cart')) > 0)
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
-                                {{ count(session('cart')) }}
-                                <span class="visually-hidden">items in cart</span>
-                            </span>
-                        @endif
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link text-dark position-relative py-lg-0 {{ request()->is('my-orders*') ? 'active-nav' : '' }}" href="{{ route('orders.my') }}">
-                        <i class="fa-solid fa-list fa-lg"></i>
-                    </a>
+                    <a class="nav-link text-dark {{ request()->is('shop*') ? 'active-nav' : '' }}" href="{{ route('shop.index') }}">Shop</a>
                 </li>
 
                 @auth
-                    <li class="nav-item ms-lg-3">
-                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                            @csrf
-                            <button type="submit" class="btn btn-outline-dark btn-sm fw-bold">Logout</button>
-                        </form>
+                    <li class="nav-item dropdown ms-lg-3">
+                        <a class="nav-link dropdown-toggle text-dark d-flex align-items-center py-0" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="{{ auth()->user()->image_path ? asset('storage/' . auth()->user()->image_path) : asset('storage/placeholders/default-avatar.jpg') }}" 
+                                 class="rounded-circle border border-white shadow-sm" 
+                                 style="width: 35px; height: 35px; object-fit: cover;" 
+                                 alt="Profile">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm mt-2" aria-labelledby="userDropdown">
+                            <li>
+                                <div class="dropdown-header d-lg-none">
+                                    <div class="fw-bold text-dark">{{ auth()->user()->name }}</div>
+                                    <small>{{ auth()->user()->email }}</small>
+                                </div>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 {{ request()->is('profile*') ? 'text-pink fw-bold' : '' }}" href="{{ route('profile.show') }}">
+                                    <i class="fa-solid fa-user-circle me-2 opacity-75"></i> My Profile
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 {{ request()->is('my-orders*') ? 'text-pink fw-bold' : '' }}" href="{{ route('orders.my') }}">
+                                    <i class="fa-solid fa-bag-shopping me-2 opacity-75"></i> My Orders
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider opacity-50"></li>
+                            <li>
+                                <form action="{{ route('logout') }}" method="POST" class="px-2">
+                                    @csrf
+                                    <button type="submit" class="btn btn-dark btn-sm w-100 fw-bold py-2 mt-1">
+                                        <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
                     </li>
                 @else
                     <li class="nav-item ms-lg-3">
@@ -76,28 +60,18 @@
 </nav>
 
 <style>
-    /* Styling for the active state */
-    .nav-link.active-nav {
-        font-weight: 800 !important;
-        position: relative;
+    /* Dropdown Hover Effects */
+    .dropdown-item:active {
+        background-color: #ec4899;
     }
-
-    /* Adds a sleek underline to the active desktop link */
-    @media (min-width: 992px) {
-        .nav-link.active-nav::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 10%;
-            width: 80%;
-            height: 2px;
-            background-color: #000;
-            border-radius: 2px;
-        }
+    .dropdown-item:hover {
+        background-color: rgba(236, 72, 153, 0.05);
+        color: #ec4899;
     }
     
-    /* Hover effect for better interactivity */
-    .nav-link:hover {
-        opacity: 0.7;
+    /* Ensure the arrow looks okay on the pink nav */
+    .dropdown-toggle::after {
+        vertical-align: middle;
+        color: rgba(0,0,0,0.5);
     }
 </style>

@@ -8,7 +8,7 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\AuthController;
-
+use App\Http\Controllers\ProfileController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -30,7 +30,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/checkout', [ShopController::class, 'checkout'])->name('checkout.index');
     Route::post('/checkout', [ShopController::class, 'processCheckout'])->name('checkout.store');
     Route::get('/checkout/success/{order_number}', [ShopController::class, 'success'])->name('checkout.success');
-    Route::get('/my-orders', [ShopController::class, 'myOrders'])->name('orders.my');
+    Route::get('/my-orders', action: [ShopController::class, 'myOrders'])->name('orders.my');
+    Route::put('/profile-update/{user}', action: [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile/avatar/{user}', [ProfileController::class, 'deleteAvatar'])->name('profile.avatar.delete');
+    Route::get('/my-profile', action: [ProfileController::class, 'profile'])->name('profile.show');
+
+
 });
 
 Route::middleware(['auth', 'admin'])

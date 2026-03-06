@@ -217,4 +217,5 @@ class ShopController extends Controller
 
         return view('shop.my-orders', compact('currentOrders', 'orderHistory'));
     }
+
 }
