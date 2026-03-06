@@ -17,13 +17,13 @@
                         <i class="fas fa-camera"></i>
                     </label>
                 </div>
+                <h4 class="fw-bold mb-0 text-dark">{{ auth()->user()->name }}</h4>
+                <p class="text-muted small mb-4">{{ auth()->user()->email }}</p>
 
                 @if(auth()->user()->image_path)
                     <form action="{{ route('profile.avatar.delete', auth()->user()) }}" method="POST" onsubmit="return confirm('Remove profile photo?')">
                         @csrf
                         @method('DELETE')
-                            <h4 class="fw-bold mb-0 text-dark">{{ auth()->user()->name }}</h4>
-                            <p class="text-muted small mb-4">{{ auth()->user()->email }}</p>
                         <button type="submit" class="btn btn-outline-pink btn-sm px-3 rounded-pill fw-bold mb-3">
                             <i class="fas fa-trash-alt me-1"></i> Remove Photo
                         </button>
