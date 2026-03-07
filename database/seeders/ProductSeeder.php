@@ -15,8 +15,8 @@ class ProductSeeder extends Seeder
         for ($i = 1; $i <= 20; $i++) {
             // 1. Insert into 'products' table
             $productId = DB::table('products')->insertGetId([
-                'brand_id'    => rand(1, 22), 
-                'category_id' => rand(1, 12),
+                'brand_id'    => rand(1, DB::table('brands')->count()), 
+                'category_id' => rand(1, DB::table('categories')->count()),
                 'name'        => $productNames[array_rand($productNames)] . " #$i",
                 'description' => "Professional formula for a flawless finish.",
                 'finish'      => $finishes[array_rand($finishes)],
