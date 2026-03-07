@@ -4,6 +4,53 @@
 <div class="container py-5 mt-4">
     <h2 class="fw-bold text-dark mb-4"><i class="fa-solid fa-chart-line me-2 text-pink"></i>Store Analytics</h2>
 
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm p-3 info-card">
+                <div class="d-flex align-items-center">
+                    <div class="icon-box bg-soft-pink text-pink"><i class="fa-solid fa-coins"></i></div>
+                    <div class="ms-3">
+                        <small class="text-muted fw-bold">TOTAL SALES</small>
+                        <h4 class="fw-bold mb-0">₱{{ number_format($totalSales, 2) }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm p-3 info-card">
+                <div class="d-flex align-items-center">
+                    <div class="icon-box bg-soft-blue text-blue"><i class="fa-solid fa-shopping-cart"></i></div>
+                    <div class="ms-3">
+                        <small class="text-muted fw-bold">ORDERS</small>
+                        <h4 class="fw-bold mb-0">{{ number_format($totalOrders) }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm p-3 info-card">
+                <div class="d-flex align-items-center">
+                    <div class="icon-box bg-soft-green text-green"><i class="fa-solid fa-users"></i></div>
+                    <div class="ms-3">
+                        <small class="text-muted fw-bold">CUSTOMERS</small>
+                        <h4 class="fw-bold mb-0">{{ number_format($totalCustomers) }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm p-3 info-card">
+                <div class="d-flex align-items-center">
+                    <div class="icon-box bg-soft-orange text-orange"><i class="fa-solid fa-box"></i></div>
+                    <div class="ms-3">
+                        <small class="text-muted fw-bold">PRODUCTS</small>
+                        <h4 class="fw-bold mb-0">{{ number_format($totalProducts) }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <ul class="nav nav-tabs border-0 mb-4" id="analyticsTabs" role="tablist">
         <li class="nav-item">
             <button class="nav-link active" id="performance-tab" data-bs-toggle="tab" data-bs-target="#performance" type="button" role="tab">Sales Performance</button>
@@ -45,22 +92,17 @@
             </div>
         </div>
 
-        {{-- 3. Product Share (Side List Layout) --}}
+        {{-- 3. Product Share --}}
         <div class="tab-pane fade" id="share" role="tabpanel">
             <div class="card border-0 shadow-sm p-4">
                 <h6 class="fw-bold text-muted text-uppercase mb-4">Product Revenue Share</h6>
-                
                 <div class="row align-items-center">
                     <div class="col-lg-7 border-end">
-                        <div style="height: 400px;">
-                            <canvas id="productPieChart"></canvas>
-                        </div>
+                        <div style="height: 400px;"><canvas id="productPieChart"></canvas></div>
                     </div>
-
                     <div class="col-lg-5">
                         <div class="ps-lg-3">
-                            <div id="chart-legend" class="pe-2" style="max-height: 400px; overflow-y: auto; scrollbar-width: thin;">
-                                </div>
+                            <div id="chart-legend" class="pe-2" style="max-height: 400px; overflow-y: auto; scrollbar-width: thin;"></div>
                         </div>
                     </div>
                 </div>
@@ -113,30 +155,23 @@
             }
         });
 
-        // 3. PRODUCT PIE CHART WITH SIDE LIST
+        // 3. PRODUCT PIE CHART
         const pieData = {!! json_encode($pieData) !!};
         const pieLabels = {!! json_encode($pieLabels) !!};
         const totalRevenue = pieData.reduce((a, b) => a + Number(b), 0);
-        
-        // Generate consistent pinkish colors
         const colors = pieData.map((_, i) => `hsl(330, 75%, ${Math.max(25, 85 - (i * 3.5))}%)`);
 
         const pieChart = new Chart(document.getElementById('productPieChart'), {
             type: 'pie',
             data: {
                 labels: pieLabels,
-                datasets: [{ 
-                    data: pieData, 
-                    backgroundColor: colors, 
-                    borderWidth: 1,
-                    borderColor: '#fff'
-                }]
+                datasets: [{ data: pieData, backgroundColor: colors, borderWidth: 1, borderColor: '#fff' }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { display: false }, // Using custom side list instead
+                    legend: { display: false },
                     tooltip: {
                         callbacks: {
                             label: function(context) {
@@ -150,18 +185,13 @@
             }
         });
 
-        // INJECT SIDE LIST ITEMS
         const legendContainer = document.getElementById('chart-legend');
-        
         pieLabels.forEach((label, i) => {
             const val = pieData[i];
             const pct = ((val / totalRevenue) * 100).toFixed(1) + '%';
-            
             const item = document.createElement('div');
             item.className = 'd-flex align-items-center justify-content-between p-2 mb-1 rounded border-bottom shadow-sm-hover';
             item.style.cursor = 'pointer';
-            item.style.transition = 'all 0.2s';
-            
             item.innerHTML = `
                 <div class="d-flex align-items-center overflow-hidden">
                     <span style="width:12px; height:12px; background:${colors[i]}; border-radius:3px; flex-shrink:0; margin-right:10px;"></span>
@@ -170,33 +200,28 @@
                 <div class="text-end flex-shrink-0 ms-2">
                     <div class="small fw-bold text-pink">${pct}</div>
                     <div class="text-muted" style="font-size: 0.7rem;">₱${Number(val).toLocaleString()}</div>
-                </div>
-            `;
-
-            // Hover effects
-            item.onmouseover = () => item.style.backgroundColor = '#fff0f6';
-            item.onmouseout = () => item.style.backgroundColor = 'transparent';
-
-            // Click to hide/show slice
+                </div>`;
             item.onclick = () => {
                 const meta = pieChart.getDatasetMeta(0);
                 meta.data[i].hidden = !meta.data[i].hidden;
                 item.style.opacity = meta.data[i].hidden ? '0.3' : '1';
-                item.style.textDecoration = meta.data[i].hidden ? 'line-through' : 'none';
                 pieChart.update();
             };
-
             legendContainer.appendChild(item);
         });
     });
 </script>
 
 <style>
-    /* Styling for the custom scrollbar on the right list */
+    .info-card { transition: transform 0.2s; }
+    .info-card:hover { transform: translateY(-5px); }
+    .icon-box { width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 1.25rem; }
+    .bg-soft-pink { background: #fce7f3; color: #ec4899; }
+    .bg-soft-blue { background: #e0f2fe; color: #0ea5e9; }
+    .bg-soft-green { background: #dcfce7; color: #22c55e; }
+    .bg-soft-orange { background: #ffedd5; color: #f97316; }
     #chart-legend::-webkit-scrollbar { width: 5px; }
-    #chart-legend::-webkit-scrollbar-track { background: #f1f1f1; }
     #chart-legend::-webkit-scrollbar-thumb { background: #ec4899; border-radius: 10px; }
-    .shadow-sm-hover:hover { box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important; }
 </style>
 @endpush
 @endsection

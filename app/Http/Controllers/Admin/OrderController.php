@@ -7,6 +7,8 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 use App\DataTables\OrderDataTable;
 use Illuminate\Support\Facades\DB;
+use App\Models\User;
+use App\Models\Product;
 
 class OrderController extends Controller
 {
@@ -44,37 +46,51 @@ class OrderController extends Controller
         return redirect()->back()->with('success', 'Order status updated successfully!');
     }
 
+   
     public function dashboard(Request $request)
     {
         $start = $request->input('start_date');
         $end = $request->input('end_date');
 
-        // 1. YEARLY SALES (Line Chart)
-        $yearlySales = Order::selectRaw('YEAR(created_at) as year, SUM(total_amount) as total')
+        // --- NEW: Data for Information Cards ---
+        $totalSales = Order::where('status', '!=', 'Cancelled')->sum('total_amount');
+        $totalOrders = Order::count();
+        $totalCustomers = User::where('role', 'customer')->count();
+        $totalProducts = Product::count();
+
+        // 1. YEARLY SALES (Line Chart) - YOUR ORIGINAL LOGIC
+        $yearlySales = Order::where('status', '!=', 'Cancelled')
+            ->selectRaw('YEAR(created_at) as year, SUM(total_amount) as total')
             ->groupBy('year')->orderBy('year', 'asc')->get();
         $lineLabels = $yearlySales->pluck('year');
         $lineData = $yearlySales->pluck('total');
 
-        // 2. RANGE SALES (Bar Chart)
-        $barQuery = Order::selectRaw('DATE(created_at) as date, SUM(total_amount) as total');
+        // 2. RANGE SALES (Bar Chart) - YOUR ORIGINAL LOGIC
+        $barQuery = Order::where('status', '!=', 'Cancelled')
+            ->selectRaw('DATE(created_at) as date, SUM(total_amount) as total');
         if ($start && $end) {
-            $barQuery->whereBetween('created_at', [$start . ' 00:00:00', $end . ' 23:59:59']);
+            $barQuery->whereBetween('created_at', ["{$start} 00:00:00", "{$end} 23:59:59"]);
         }
         $rangeSales = $barQuery->groupBy('date')->orderBy('date')->get();
         $barLabels = $rangeSales->pluck('date');
         $barData = $rangeSales->pluck('total');
 
-        // 3. PRODUCT PIE (ALL PRODUCTS)
-        // Removed ->take(5) so all products are included
+        // 3. PRODUCT PIE (ALL PRODUCTS) - YOUR ORIGINAL LOGIC
         $productSales = DB::table('order_items')
             ->join('shades', 'order_items.shade_id', '=', 'shades.id')
             ->join('products', 'shades.product_id', '=', 'products.id')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->where('orders.status', '!=', 'Cancelled')
             ->select('products.name', DB::raw('SUM(order_items.price * order_items.quantity) as total_revenue'))
             ->groupBy('products.name')
             ->orderByDesc('total_revenue')
-            ->get(); 
+            ->get();
 
         return view('admin.dashboard', [
+            'totalSales' => $totalSales,
+            'totalOrders' => $totalOrders,
+            'totalCustomers' => $totalCustomers,
+            'totalProducts' => $totalProducts,
             'lineLabels' => $lineLabels, 
             'lineData' => $lineData,
             'barLabels' => $barLabels, 
