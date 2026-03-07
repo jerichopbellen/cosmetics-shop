@@ -2,18 +2,32 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Brand;
+use Illuminate\Support\Facades\DB;
 
 class BrandSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Generate 50 fake brands using the factory we just made
-        Brand::factory()->count(50)->create();
+        $newBrands = [
+            'Lucky Beauty',
+            'Colourette',
+            'Happy Skin',
+            'Detail Cosmetics',
+            'Clocheflame',
+            'Kiko Milano',
+            'Rare Beauty',
+            'Fenty Beauty',
+            'Elf Cosmetics',
+            'Maybelline'
+        ];
+
+        foreach ($newBrands as $brandName) {
+            // This checks if the name exists before inserting
+            DB::table('brands')->updateOrInsert(
+                ['name' => $brandName],
+                ['created_at' => now(), 'updated_at' => now()]
+            );
+        }
     }
 }
