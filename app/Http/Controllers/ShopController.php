@@ -173,30 +173,6 @@ class ShopController extends Controller
         return view('shop.success', compact('order_number'));
     }
 
-    public function update(Request $request, Order $order)
-    {
-        // 1. Validate only the status
-        $validated = $request->validate([
-            'status' => 'required|in:Pending,Packing,Shipped,Delivered,Cancelled',
-        ]);
-
-        try {
-            // 2. Update only the status field
-            $order->update([
-                'status' => $validated['status'],
-            ]);
-
-            return redirect()
-                ->route('admin.orders.show', $order->id)
-                ->with('success', "Order status updated to {$validated['status']}.");
-
-        } catch (\Exception $e) {
-            return redirect()
-                ->back()
-                ->with('error', 'Failed to update order status.');
-        }
-    }
-
     public function myOrders()
     {
         // Check if user is logged in to avoid errors
@@ -216,6 +192,30 @@ class ShopController extends Controller
         $orderHistory = $orders->whereIn('status', ['Delivered', 'Cancelled']);
 
         return view('shop.my-orders', compact('currentOrders', 'orderHistory'));
+    }
+
+    public function cancel(Order $order)
+    {
+        if (!\in_array($order->status, ['Pending', 'Packing'])) {
+            return back()->with('error', 'Too late! This order is already being shipped.');
+        }
+
+        DB::beginTransaction();
+
+        try {
+            // Restore stock for all items in the order
+            foreach ($order->orderItems as $item) {
+                $item->shade->increment('stock', $item->quantity);
+            }
+
+            $order->update(['status' => 'Cancelled']);
+            DB::commit();
+
+            return back()->with('success', "Order #{$order->order_number} cancelled successfully.");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Failed to cancel order: ' . $e->getMessage());
+        }
     }
 
 }

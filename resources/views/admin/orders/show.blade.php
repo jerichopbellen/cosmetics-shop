@@ -98,7 +98,13 @@
                             <label class="form-label small text-uppercase fw-bold text-muted">Order Status</label>
                             <select name="status" class="form-select border-pink shadow-none py-2">
                                 @foreach(['Pending', 'Packing', 'Shipped', 'Delivered', 'Cancelled'] as $status)
-                                    <option value="{{ $status }}" {{ $order->status == $status ? 'selected' : '' }}>
+                                    @php
+                                        $disabled = false;
+                                        if ($order->status == 'Packing' && $status == 'Pending') $disabled = true;
+                                        if ($order->status == 'Shipped' && in_array($status, ['Pending', 'Packing', 'Cancelled'])) $disabled = true;
+                                        if ($order->status == 'Delivered' && $status != 'Delivered') $disabled = true;
+                                    @endphp
+                                    <option value="{{ $status }}" {{ $order->status == $status ? 'selected' : '' }} {{ $disabled ? 'disabled' : '' }}>
                                         {{ $status }}
                                     </option>
                                 @endforeach

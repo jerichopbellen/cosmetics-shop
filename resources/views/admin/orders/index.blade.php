@@ -9,7 +9,17 @@
             </h2>
             <p class="text-muted">Manage customer purchases and fulfillment status.</p>
         </div>
+        <div class="col-md-3">
+            <select id="status-filter" class="form-select border-pink shadow-sm">
+                <option value="">All Statuses</option>
+                <option value="Pending">Pending</option>
+                <option value="Packing">Packing</option>
+                <option value="Shipped">Shipped</option>
+                <option value="Delivered">Delivered</option>
+                <option value="Cancelled">Cancelled</option>
+            </select>
         </div>
+    </div>
 
     <div class="card border-0 shadow-sm overflow-hidden">
         <div style="height: 4px; background-color: #ec4899;"></div>
@@ -28,5 +38,15 @@
 
 @push('scripts')
     {{ $dataTable->scripts(attributes: ['type' => 'module']) }}
+    
+    <script type="module">
+        $(function() {
+            // Listen for changes on the dropdown
+            $('#status-filter').on('change', function() {
+                // Reload the table (it will automatically pick up the data from ajax data function)
+                window.LaravelDataTables["order-table"].draw();
+            });
+        });
+    </script>
 @endpush
 @endsection

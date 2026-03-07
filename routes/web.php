@@ -34,6 +34,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profile-update/{user}', action: [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile/avatar/{user}', [ProfileController::class, 'deleteAvatar'])->name('profile.avatar.delete');
     Route::get('/my-profile', action: [ProfileController::class, 'profile'])->name('profile.show');
+    Route::patch('/orders/{order}/cancel', [ShopController::class, 'cancel'])->name('orders.cancel');
 
 
 });

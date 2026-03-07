@@ -6,7 +6,6 @@ use App\Models\Order;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
-use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
 
@@ -30,7 +29,7 @@ class OrderDataTable extends DataTable
                 };
                 return '<span class="badge '.$class.'">'.$row->status.'</span>';
             })
-            ->editColumn('total_amount', fn($row) => '$' . number_format($row->total_amount, 2))
+            ->editColumn('total_amount', fn($row) => '₱' . number_format($row->total_amount, 2)) // Changed to Pesos to match your dashboard
             ->editColumn('created_at', fn($row) => $row->created_at->format('Y-m-d H:i'))
             ->rawColumns(['user_id', 'status', 'action'])
             ->setRowId('id');
@@ -38,8 +37,14 @@ class OrderDataTable extends DataTable
 
     public function query(Order $model): QueryBuilder
     {
-        // Eager load the user relation
-        return $model->newQuery()->with('user')->select('orders.*');
+        $query = $model->newQuery()->with('user')->select('orders.*');
+
+        // Apply Status Filter
+        if ($status = request('status')) {
+            $query->where('status', $status);
+        }
+
+        return $query;
     }
 
     public function html(): HtmlBuilder
@@ -47,8 +52,8 @@ class OrderDataTable extends DataTable
         return $this->builder()
                     ->setTableId('order-table')
                     ->columns($this->getColumns())
-                    ->minifiedAjax()
-                    ->orderBy(4) // Order by created_at
+                    ->minifiedAjax('', 'data.status = $("#status-filter").val();') // Passes the dropdown value to the query
+                    ->orderBy(4)
                     ->selectStyleSingle();
     }
 

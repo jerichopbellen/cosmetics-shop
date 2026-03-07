@@ -1,7 +1,6 @@
 @extends('layouts.base')
 
 @section('body')
-
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold mb-0">My Orders</h2>
@@ -24,6 +23,7 @@
     </ul>
 
     <div class="tab-content mt-4">
+        {{-- Active Shipments Tab --}}
         <div class="tab-pane fade show active" id="active-content" role="tabpanel">
             @forelse($currentOrders as $order)
                 <div class="card border-0 shadow-sm mb-3 overflow-hidden">
@@ -42,7 +42,7 @@
                                 @php
                                     $statusColor = match($order->status) {
                                         'Pending' => 'bg-warning text-dark',
-                                        'Packing' => 'btn-pink text-white',
+                                        'Packing' => 'bg-pink text-white',
                                         'Shipped' => 'bg-info text-white',
                                         default => 'bg-secondary text-white'
                                     };
@@ -81,16 +81,33 @@
                                     @endforeach
                                 </div>
                                 <div class="col-lg-5">
-                                    <div class="bg-light p-3 rounded h-100 border-start border-pink border-4">
-                                        <h6 class="fw-bold text-uppercase small text-muted mb-2">Shipping Address</h6>
-                                        <div class="small text-dark lh-sm">
-                                            <strong>{{ $order->first_name }} {{ $order->last_name }}</strong><br>
-                                            {{ $order->address }}<br>
-                                            {{ $order->city }}, {{ $order->state }} {{ $order->zip_code }}<br>
-                                            <span class="text-muted small mt-2 d-block">
-                                                <i class="fa-solid fa-phone me-1"></i> {{ $order->phone }}
-                                            </span>
+                                    <div class="bg-light p-3 rounded h-100 border-start border-pink border-4 d-flex flex-column justify-content-between">
+                                        <div>
+                                            <h6 class="fw-bold text-uppercase small text-muted mb-2">Shipping Address</h6>
+                                            <div class="small text-dark lh-sm">
+                                                <strong>{{ $order->first_name }} {{ $order->last_name }}</strong><br>
+                                                {{ $order->address }}<br>
+                                                {{ $order->city }}, {{ $order->state }} {{ $order->zip_code }}<br>
+                                                <span class="text-muted small mt-2 d-block">
+                                                    <i class="fa-solid fa-phone me-1"></i> {{ $order->phone }}
+                                                </span>
+                                            </div>
                                         </div>
+
+                                        @if(in_array($order->status, ['Pending', 'Packing']))
+                                            <div class="mt-4 pt-3 border-top border-pink-subtle">
+                                                <form action="{{ route('orders.cancel', $order->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?')">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <button type="submit" class="btn btn-sm btn-danger w-100 fw-bold">
+                                                        <i class="fa-solid fa-xmark me-2"></i>CANCEL ORDER
+                                                    </button>
+                                                </form>
+                                                <small class="text-muted d-block mt-1" style="font-size: 0.7rem;">
+                                                    *Orders can only be cancelled while "Pending" or "Packing".
+                                                </small>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -102,10 +119,12 @@
             @endforelse
         </div>
 
+        {{-- Order History Tab --}}
         <div class="tab-pane fade" id="history-content" role="tabpanel">
             @forelse($orderHistory as $history)
                 <div class="card border-0 shadow-sm mb-3 overflow-hidden">
-                    <div style="height: 4px; background-color: #ec4899;"></div> <div class="card-body">
+                    <div style="height: 4px; background-color: #ec4899;"></div> 
+                    <div class="card-body">
                         <div class="row align-items-center">
                             <div class="col-md-3">
                                 <span class="text-muted small text-uppercase fw-semibold">Order #</span>
