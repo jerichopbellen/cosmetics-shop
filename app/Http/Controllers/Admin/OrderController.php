@@ -53,20 +53,20 @@ class OrderController extends Controller
         $end = $request->input('end_date');
 
         // --- NEW: Data for Information Cards ---
-        $totalSales = Order::where('status', '!=', 'Cancelled')->sum('total_amount');
+        $totalSales = Order::where('status', 'Delivered')->sum('total_amount');
         $totalOrders = Order::count();
         $totalCustomers = User::where('role', 'customer')->count();
         $totalProducts = Product::count();
 
         // 1. YEARLY SALES (Line Chart) - YOUR ORIGINAL LOGIC
-        $yearlySales = Order::where('status', '!=', 'Cancelled')
+        $yearlySales = Order::where('status', 'Delivered')
             ->selectRaw('YEAR(created_at) as year, SUM(total_amount) as total')
             ->groupBy('year')->orderBy('year', 'asc')->get();
         $lineLabels = $yearlySales->pluck('year');
         $lineData = $yearlySales->pluck('total');
 
         // 2. RANGE SALES (Bar Chart) - YOUR ORIGINAL LOGIC
-        $barQuery = Order::where('status', '!=', 'Cancelled')
+        $barQuery = Order::where('status', 'Delivered')
             ->selectRaw('DATE(created_at) as date, SUM(total_amount) as total');
         if ($start && $end) {
             $barQuery->whereBetween('created_at', ["{$start} 00:00:00", "{$end} 23:59:59"]);
@@ -80,7 +80,7 @@ class OrderController extends Controller
             ->join('shades', 'order_items.shade_id', '=', 'shades.id')
             ->join('products', 'shades.product_id', '=', 'products.id')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
-            ->where('orders.status', '!=', 'Cancelled')
+            ->where('orders.status', 'Delivered')
             ->select('products.name', DB::raw('SUM(order_items.price * order_items.quantity) as total_revenue'))
             ->groupBy('products.name')
             ->orderByDesc('total_revenue')
