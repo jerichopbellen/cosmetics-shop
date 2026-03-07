@@ -41,6 +41,7 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'admin'])
     ->prefix('admin')
     ->group(function () {
+        Route::get('/dashboard', [OrderController::class, 'dashboard'])->name('admin.dashboard');
         Route::resource('brands', BrandController::class);
         Route::resource('categories', CategoryController::class);
         Route::resource('products', ProductController::class);

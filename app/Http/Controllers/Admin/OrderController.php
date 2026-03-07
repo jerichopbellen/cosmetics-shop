@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use App\DataTables\OrderDataTable;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -41,5 +42,43 @@ class OrderController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Order status updated successfully!');
+    }
+
+   public function dashboard(Request $request)
+    {
+        $start = $request->input('start_date');
+        $end = $request->input('end_date');
+
+        // 1. YEARLY SALES (Line Chart) - Remains All Time
+        $yearlySales = Order::selectRaw('YEAR(created_at) as year, SUM(total_amount) as total')
+            ->groupBy('year')->orderBy('year', 'asc')->get();
+        $lineLabels = $yearlySales->pluck('year');
+        $lineData = $yearlySales->pluck('total');
+
+        // 2. RANGE SALES (Bar Chart) - Respond to Empty Dates
+        $barQuery = Order::selectRaw('DATE(created_at) as date, SUM(total_amount) as total');
+        
+        if ($start && $end) {
+            $barQuery->whereBetween('created_at', [$start . ' 00:00:00', $end . ' 23:59:59']);
+        }
+        
+        $rangeSales = $barQuery->groupBy('date')->orderBy('date')->get();
+        $barLabels = $rangeSales->pluck('date');
+        $barData = $rangeSales->pluck('total');
+
+        // 3. PRODUCT PIE (Top 5)
+        $productSales = DB::table('order_items')
+            ->join('shades', 'order_items.shade_id', '=', 'shades.id')
+            ->join('products', 'shades.product_id', '=', 'products.id')
+            ->select('products.name', DB::raw('SUM(order_items.price * order_items.quantity) as total_revenue'))
+            ->groupBy('products.name')->orderByDesc('total_revenue')->take(5)->get();
+
+        return view('admin.dashboard', [
+            'lineLabels' => $lineLabels, 'lineData' => $lineData,
+            'barLabels' => $barLabels, 'barData' => $barData,
+            'pieLabels' => $productSales->pluck('name'),
+            'pieData' => $productSales->pluck('total_revenue'),
+            'start' => $start, 'end' => $end
+        ]);
     }
 }
