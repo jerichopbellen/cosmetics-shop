@@ -29,7 +29,7 @@ class ProductSeeder extends Seeder
             for ($img = 1; $img <= 2; $img++) {
                 DB::table('product_images')->insert([
                     'product_id' => $productId,
-                    'image_path' => null,
+                    'image_path' => '/placeholders/product.png', 
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -44,7 +44,7 @@ class ProductSeeder extends Seeder
                     'hex_code'   => '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT),
                     'price'      => rand(199, 899),
                     'stock'      => rand(10, 100),
-                    'image_path' => null, 
+                    'image_path' => '/placeholders/product.png', 
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
