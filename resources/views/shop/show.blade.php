@@ -9,13 +9,13 @@
                 $firstShade = $product->shades->first();
                 $defaultImage = $firstShade->image_path ?? ($product->images->first()->image_path ?? 'placeholders/product.png');
             @endphp
-            <img id="main-display-image" src="{{ asset('storage/' . $defaultImage) }}" 
+            <img id="main-display-image" src="{{ asset("storage/{$defaultImage}") }}" 
                  class="img-fluid" style="max-height: 500px; object-fit: contain;">
             </div>
             
             <div class="d-flex gap-2 overflow-auto pb-2 custom-scrollbar">
             @foreach($product->images as $img)
-                <img src="{{ asset('storage/' . ($img->image_path ?? 'placeholders/product.png')) }}" 
+                <img src="{{ asset("storage/" . ($img->image_path ?? 'placeholders/product.png')) }}" 
                  class="img-thumbnail thumb-select" 
                  style="width: 80px; height: 80px; cursor: pointer; object-fit: cover;">
             @endforeach
@@ -35,10 +35,10 @@
             
             <div class="d-flex align-items-center gap-3 mb-4">
                 <h2 class="fw-bold mb-0 text-pink" id="dynamic-price">
-                    ${{ number_format($firstShade->price, 2) }}
+                    ₱{{ number_format($firstShade->price, 2) }}
                 </h2>
                 <span id="stock-status" class="badge {{ $firstShade->stock > 0 ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }} px-3 py-2">
-                    {{ $firstShade->stock > 0 ? 'In Stock' : 'Out of Stock' }}
+                    {{ $firstShade->stock > 0 ? "In Stock ({$firstShade->stock})" : 'Out of Stock' }}
                 </span>
             </div>
 
@@ -59,7 +59,7 @@
                                  data-shade-id="{{ $shade->id }}"
                                  data-name="{{ $shade->shade_name }}"
                                  data-price="{{ number_format($shade->price, 2) }}"
-                                 data-img="{{ asset('storage/' . ($shade->image_path ?? $product->images->first()->image_path ?? 'placeholders/product.png')) }}"
+                                 data-img="{{ asset("storage/" . ($shade->image_path ?? $product->images->first()->image_path ?? 'placeholders/product.png')) }}"
                                  data-stock="{{ $shade->stock }}"
                                  title="{{ $shade->shade_name }}">
                             </div>
@@ -113,7 +113,7 @@
             
             // Text & Price Updates
             $('#shade-name-display').text($this.data('name'));
-            $('#dynamic-price').text('$' + $this.data('price'));
+            $('#dynamic-price').text('₱' + $this.data('price'));
             
             // Image Update with smooth fade
             $('#main-display-image').fadeOut(150, function() {
@@ -134,7 +134,7 @@
                 $('#stock-status').text('Out of Stock').removeClass('bg-success-subtle text-success').addClass('bg-danger-subtle text-danger');
                 cartBtn.prop('disabled', true).text('Out of Stock');
             } else {
-                $('#stock-status').text('In Stock').removeClass('bg-danger-subtle text-danger').addClass('bg-success-subtle text-success');
+                $('#stock-status').text(`In Stock (${stock})`).removeClass('bg-danger-subtle text-danger').addClass('bg-success-subtle text-success');
                 cartBtn.prop('disabled', false).html('<i class="fas fa-shopping-cart me-2"></i> Add to Cart');
             }
         });

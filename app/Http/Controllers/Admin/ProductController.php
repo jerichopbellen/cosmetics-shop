@@ -102,7 +102,9 @@ class ProductController extends Controller
             if (!empty($imageId)) {
                 $img = ProductImage::find($imageId);
                 if ($img && $img->image_path) {
-                Storage::disk('public')->delete($img->image_path);
+                    if ($img->image_path !== '/placeholders/product.png') {
+                        Storage::disk('public')->delete($img->image_path);
+                    }
                 $img->delete();
                 }
             }
@@ -134,7 +136,9 @@ class ProductController extends Controller
                 if ($request->hasFile("shades.$index.image")) {
                     // Delete old image if it exists
                     if ($shade->image_path) {
-                        Storage::disk('public')->delete($shade->image_path);
+                        if ($shade->image_path !== '/placeholders/product.png') {
+                            Storage::disk('public')->delete($shade->image_path);
+                        }
                     }
                     // Store the new one
                     $shade->image_path = $request->file("shades.$index.image")->store('products/shades', 'public');
