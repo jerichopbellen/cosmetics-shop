@@ -27,9 +27,8 @@
                 <div class="card h-100 border shadow-sm product-card transition-all">
                     <div class="position-relative overflow-hidden rounded-top">
                         @php
-                            $primaryImage = $product->images->first()?->image_path ?? 'placeholders/product.jpg';
-                        @endphp
-                        
+                            $primaryImage = $product->images->first()?->image_path ?? 'placeholders/product.png';
+                        @endphp       
                         <a href="{{ route('shop.show', $product->id) }}">
                             <img src="{{ asset('storage/' . $primaryImage) }}" 
                                  class="card-img-top object-fit-cover" 

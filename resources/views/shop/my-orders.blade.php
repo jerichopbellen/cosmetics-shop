@@ -68,7 +68,7 @@
                                     @foreach($order->orderItems as $item)
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <div class="d-flex align-items-center text-start">
-                                                <img src="{{ asset('storage/' . ($item->shade->image_path ?? 'placeholders/product.jpg')) }}" class="rounded border border-pink p-1 me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                                <img src="{{ asset('storage/' . ($item->shade->image_path ?? 'placeholders/product.png')) }}" class="rounded border border-pink p-1 me-3" style="width: 50px; height: 50px; object-fit: cover;">
                                                 <div class="small text-start">
                                                     <div class="fw-bold text-dark">{{ $item->shade->product->name }}</div>
                                                     <div class="text-muted small">
@@ -163,7 +163,7 @@
                                     @foreach($history->orderItems as $item)
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <div class="d-flex align-items-center">
-                                                <img src="{{ asset('storage/' . ($item->shade->image_path ?? 'placeholders/product.jpg')) }}" class="rounded border border-pink p-1 me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                                <img src="{{ asset('storage/' . ($item->shade->image_path ?? 'placeholders/product.png')) }}" class="rounded border border-pink p-1 me-3" style="width: 50px; height: 50px; object-fit: cover;">
                                                 <div class="small">
                                                     <div class="fw-bold text-dark">{{ $item->shade->product->name }}</div>
                                                     <div class="text-muted small">

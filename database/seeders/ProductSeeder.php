@@ -12,7 +12,7 @@ class ProductSeeder extends Seeder
         $productNames = ['Velvet Lip Cream', 'Skin Tint SPF 30', 'Matte Powder', 'Serum Concealer', 'Liquid Blush'];
         $finishes = ['Matte', 'Dewy', 'Satin', 'Natural'];
 
-        for ($i = 1; $i <= 20; $i++) {
+        for ($i = 1; $i <= 15; $i++) {
             // 1. Insert into 'products' table
             $productId = DB::table('products')->insertGetId([
                 'brand_id'    => rand(1, DB::table('brands')->count()), 
@@ -29,7 +29,7 @@ class ProductSeeder extends Seeder
             for ($img = 1; $img <= 2; $img++) {
                 DB::table('product_images')->insert([
                     'product_id' => $productId,
-                    'image_path' => "https://picsum.photos/seed/prod_$productId$img/600/600",
+                    'image_path' => null,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -44,7 +44,7 @@ class ProductSeeder extends Seeder
                     'hex_code'   => '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT),
                     'price'      => rand(199, 899),
                     'stock'      => rand(10, 100),
-                    'image_path' => "https://picsum.photos/seed/shade_$i$j/200/200", 
+                    'image_path' => null, 
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);

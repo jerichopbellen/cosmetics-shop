@@ -6,7 +6,7 @@
 
     <div class="row g-3 mb-4">
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm p-3 info-card h-100">
+            <div class="card border-0 shadow-sm p-3 info-card">
                 <div class="d-flex align-items-center">
                     <div class="icon-box bg-soft-pink text-pink"><i class="fa-solid fa-coins"></i></div>
                     <div class="ms-3">
@@ -16,50 +16,38 @@
                 </div>
             </div>
         </div>
-
         <div class="col-md-3">
-            <a href="{{ route('admin.orders.index') }}" class="text-decoration-none h-100">
-                <div class="card border-0 shadow-sm p-3 info-card h-100">
-                    <div class="d-flex align-items-center">
-                        <div class="icon-box bg-soft-blue text-blue"><i class="fa-solid fa-shopping-cart"></i></div>
-                        <div class="ms-3">
-                            <small class="text-muted fw-bold">ORDERS</small>
-                            <h4 class="fw-bold mb-0 text-dark">{{ number_format($totalOrders) }}</h4>
-                        </div>
-                        <i class="fa-solid fa-chevron-right ms-auto text-muted small"></i>
+            <div class="card border-0 shadow-sm p-3 info-card">
+                <div class="d-flex align-items-center">
+                    <div class="icon-box bg-soft-blue text-blue"><i class="fa-solid fa-shopping-cart"></i></div>
+                    <div class="ms-3">
+                        <small class="text-muted fw-bold">ORDERS</small>
+                        <h4 class="fw-bold mb-0">{{ number_format($totalOrders) }}</h4>
                     </div>
                 </div>
-            </a>
+            </div>
         </div>
-    
         <div class="col-md-3">
-            <a href="{{ route('admin.users.index') }}" class="text-decoration-none h-100">
-                <div class="card border-0 shadow-sm p-3 info-card h-100">
-                    <div class="d-flex align-items-center">
-                        <div class="icon-box bg-soft-green text-green"><i class="fa-solid fa-users"></i></div>
-                        <div class="ms-3">
-                            <small class="text-muted fw-bold">CUSTOMERS</small>
-                            <h4 class="fw-bold mb-0 text-dark">{{ number_format($totalCustomers) }}</h4>
-                        </div>
-                        <i class="fa-solid fa-chevron-right ms-auto text-muted small"></i>
+            <div class="card border-0 shadow-sm p-3 info-card">
+                <div class="d-flex align-items-center">
+                    <div class="icon-box bg-soft-green text-green"><i class="fa-solid fa-users"></i></div>
+                    <div class="ms-3">
+                        <small class="text-muted fw-bold">CUSTOMERS</small>
+                        <h4 class="fw-bold mb-0">{{ number_format($totalCustomers) }}</h4>
                     </div>
                 </div>
-            </a>
+            </div>
         </div>
-
         <div class="col-md-3">
-            <a href="{{ route('products.index') }}" class="text-decoration-none h-100">
-                <div class="card border-0 shadow-sm p-3 info-card h-100">
-                    <div class="d-flex align-items-center">
-                        <div class="icon-box bg-soft-orange text-orange"><i class="fa-solid fa-box"></i></div>
-                        <div class="ms-3">
-                            <small class="text-muted fw-bold">PRODUCTS</small>
-                            <h4 class="fw-bold mb-0 text-dark">{{ number_format($totalProducts) }}</h4>
-                        </div>
-                        <i class="fa-solid fa-chevron-right ms-auto text-muted small"></i>
+            <div class="card border-0 shadow-sm p-3 info-card">
+                <div class="d-flex align-items-center">
+                    <div class="icon-box bg-soft-orange text-orange"><i class="fa-solid fa-box"></i></div>
+                    <div class="ms-3">
+                        <small class="text-muted fw-bold">PRODUCTS</small>
+                        <h4 class="fw-bold mb-0">{{ number_format($totalProducts) }}</h4>
                     </div>
                 </div>
-            </a>
+            </div>
         </div>
     </div>
 

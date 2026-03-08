@@ -5,20 +5,20 @@
     <div class="row">
         <div class="col-md-6 mb-4">
             <div class="main-image-container border rounded bg-white p-3 mb-3 text-center shadow-sm">
-                @php
-                    $firstShade = $product->shades->first();
-                    $defaultImage = $firstShade->image_path ?? ($product->images->first()->image_path ?? 'placeholder.jpg');
-                @endphp
-                <img id="main-display-image" src="{{ asset('storage/' . $defaultImage) }}" 
-                     class="img-fluid" style="max-height: 500px; object-fit: contain;">
+            @php
+                $firstShade = $product->shades->first();
+                $defaultImage = $firstShade->image_path ?? ($product->images->first()->image_path ?? 'placeholders/product.png');
+            @endphp
+            <img id="main-display-image" src="{{ asset('storage/' . $defaultImage) }}" 
+                 class="img-fluid" style="max-height: 500px; object-fit: contain;">
             </div>
             
             <div class="d-flex gap-2 overflow-auto pb-2 custom-scrollbar">
-                @foreach($product->images as $img)
-                    <img src="{{ asset('storage/' . $img->image_path) }}" 
-                         class="img-thumbnail thumb-select" 
-                         style="width: 80px; height: 80px; cursor: pointer; object-fit: cover;">
-                @endforeach
+            @foreach($product->images as $img)
+                <img src="{{ asset('storage/' . ($img->image_path ?? 'placeholders/product.png')) }}" 
+                 class="img-thumbnail thumb-select" 
+                 style="width: 80px; height: 80px; cursor: pointer; object-fit: cover;">
+            @endforeach
             </div>
         </div>
 
@@ -59,7 +59,7 @@
                                  data-shade-id="{{ $shade->id }}"
                                  data-name="{{ $shade->shade_name }}"
                                  data-price="{{ number_format($shade->price, 2) }}"
-                                 data-img="{{ asset('storage/' . ($shade->image_path ?? $product->images->first()->image_path)) }}"
+                                 data-img="{{ asset('storage/' . ($shade->image_path ?? $product->images->first()->image_path ?? 'placeholders/product.png')) }}"
                                  data-stock="{{ $shade->stock }}"
                                  title="{{ $shade->shade_name }}">
                             </div>

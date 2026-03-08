@@ -33,7 +33,7 @@
                                         <tr>
                                             <td class="ps-4">
                                                 <div class="d-flex align-items-center py-2">
-                                                    <img src="{{ asset('storage/' . $details['image']) }}" 
+                                                    <img src="{{ $details['image'] ? asset('storage/' . $details['image']) : asset('storage/placeholders/product.png') }}" 
                                                          width="70" height="70" 
                                                          class="rounded border object-fit-cover me-3 thumb-select"
                                                          alt="{{ $details['product_name'] }}">

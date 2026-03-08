@@ -99,11 +99,13 @@ class ProductController extends Controller
 
         if ($request->has('remove_images')) {
             foreach ($request->remove_images as $imageId) {
+            if (!empty($imageId)) {
                 $img = ProductImage::find($imageId);
-                if ($img) {
-                    Storage::disk('public')->delete($img->image_path);
-                    $img->delete();
+                if ($img && $img->image_path) {
+                Storage::disk('public')->delete($img->image_path);
+                $img->delete();
                 }
+            }
             }
         }
 

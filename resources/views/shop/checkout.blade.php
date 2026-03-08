@@ -53,7 +53,7 @@
                                 @php $subtotal += $item['price'] * $item['quantity'] @endphp
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <div class="d-flex align-items-center">
-                                        <img src="{{ asset('storage/' . $item['image']) }}" width="50" class="rounded border me-3">
+                                        <img src="{{ asset('storage/' . ($item['image'] ?? 'placeholders/product.png'))}}" width="50" class="rounded border me-3">
                                         <div>
                                             <div class="small fw-bold">{{ $item['product_name'] }}</div>
                                             <small class="text-muted">{{ $item['shade_name'] }} x{{ $item['quantity'] }}</small>
