@@ -28,7 +28,7 @@
     </div>
 
     <div class="mt-3">
-        <a href="{{ route('products.index') }}" class="text-muted small text-decoration-none">
+        <a href="{{ route('products.index') }}" class="text-muted small text-decoration-none me-3">
             <i class="fas fa-box me-1"></i> Switch to Products
         </a>
         <a href="{{ route('categories.index') }}" class="text-muted small text-decoration-none">
