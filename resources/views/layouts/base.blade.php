@@ -149,8 +149,31 @@
         .transition-all {
             transition: all 0.2s ease-in-out;
         }
+        .dt-buttons .btn {
+            background-color: #ffffff !important;
+            border: 1px solid #dee2e6 !important;
+            color: #6c757d !important;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            border-radius: 6px;
+            padding: 5px 15px;
+        }
+        .dt-buttons .btn:hover {
+            border-color: #ec4899 !important;
+            color: #ec4899 !important;
+            background-color: #fff1f2 !important;
+        }
+        .dataTables_filter input {
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 4px 10px;
+            outline: none;
+        }
 
-        
+        .dataTables_filter input:focus {
+            border-color: #ec4899;
+            box-shadow: 0 0 0 0.25rem rgba(236, 72, 153, 0.1);
+        }
     
     </style>
 </head>

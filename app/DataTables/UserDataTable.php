@@ -12,22 +12,27 @@ class UserDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('action', function($user){
-                return '<a href="'.route('admin.users.show', $user->id).'" class="btn btn-sm btn-dark text-white shadow-sm">
-                            <i class="fa-solid fa-eye me-1"></i> View History
-                        </a>';
+                return '
+                <div class="d-flex justify-content-center">
+                    <a href="'.route('admin.users.show', $user->id).'" class="btn btn-sm btn-outline-secondary" title="View History">
+                        <i class="fa-solid fa-eye me-1"></i> View
+                    </a>
+                </div>';
             })
             ->editColumn('created_at', fn($user) => $user->created_at->format('M d, Y'))
             ->editColumn('role', function($user) {
-                $class = $user->role === 'admin' ? 'bg-danger' : 'bg-secondary';
-                return '<span class="badge ' . $class . '">' . strtoupper($user->role) . '</span>';
+                // Using a softer pink-themed badge for admin to match the site
+                $class = $user->role === 'admin' ? 'bg-pink text-white' : 'bg-light text-dark border';
+                return '<span class="badge ' . $class . '" style="font-size: 0.75rem;">' . strtoupper($user->role) . '</span>';
             })
-            ->addColumn('total_orders', fn($user) => $user->orders->count())
+            // Using the eager-loaded count directly
+            ->addColumn('total_orders', fn($user) => $user->orders_count ?? 0)
             ->rawColumns(['action', 'role']);
     }
 
     public function query(User $model)
     {
-        // We eager load orders count to keep the table fast
+        // Eager loading counts to prevent N+1 issues
         return $model->newQuery()->withCount('orders');
     }
 
@@ -35,16 +40,21 @@ class UserDataTable extends DataTable
     {
         return $this->builder()
             ->setTableId('users-table')
-            ->columns([
-                ['data' => 'id', 'title' => 'ID'],
-                ['data' => 'name', 'title' => 'Name'],
-                ['data' => 'email', 'title' => 'Email'],
-                ['data' => 'total_orders', 'title' => 'Total Orders', 'orderable' => false],
-                ['data' => 'created_at', 'title' => 'Joined'],
-                ['data' => 'action', 'title' => '', 'orderable' => false, 'searchable' => false],
-                ['data' => 'role', 'title' => 'Role'],
-            ])
+            ->columns($this->getColumns())
             ->minifiedAjax()
             ->orderBy(0);
+    }
+
+    public function getColumns(): array
+    {
+        return [
+            ['data' => 'id', 'title' => 'ID', 'width' => '50px'],
+            ['data' => 'name', 'title' => 'Customer Name'],
+            ['data' => 'email', 'title' => 'Email Address'],
+            ['data' => 'role', 'title' => 'Role', 'addClass' => 'text-center'],
+            ['data' => 'total_orders', 'title' => 'Orders', 'addClass' => 'text-center'],
+            ['data' => 'created_at', 'title' => 'Joined'],
+            ['data' => 'action', 'title' => 'Action', 'orderable' => false, 'searchable' => false, 'addClass' => 'text-center'],
+        ];
     }
 }

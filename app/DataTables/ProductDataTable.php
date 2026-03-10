@@ -26,11 +26,6 @@ class ProductDataTable extends DataTable
             ->addColumn('category', function($row) {
                 return $row->category ? $row->category->name : 'N/A';
             })
-            // Display the count of gallery images
-            ->addColumn('gallery_count', function($row) {
-                $count = $row->images->count();
-                return '<span class="badge bg-info">' . $count . ' Photos</span>';
-            })
             // Display price range from shades
             ->addColumn('price_range', function($row) {
                 $min = $row->shades->min('price');
@@ -40,20 +35,20 @@ class ProductDataTable extends DataTable
             })
             ->addColumn('action', function($row) {
                 return '
-                <div class="d-flex justify-content-center">
-                    <a href="'.route('products.edit', $row->id).'" class="btn btn-sm btn-warning me-2 text-white">
-                        <i class="fas fa-edit"></i> Edit
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="'.route('products.edit', $row->id).'" class="btn btn-sm btn-outline-secondary" title="Edit">
+                        <i class="fas fa-edit"></i>
                     </a>
-                    <form action="'.route('products.destroy', $row->id).'" method="POST" onsubmit="return confirm(\'Delete this product and all associated shades/images?\')">
+                    <form action="'.route('products.destroy', $row->id).'" method="POST" onsubmit="return confirm(\'Delete this product?\')">
                         '.csrf_field().method_field('DELETE').'
-                        <button type="submit" class="btn btn-sm btn-danger">
-                            <i class="fas fa-trash"></i> Delete
+                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                            <i class="fas fa-trash"></i>
                         </button>
                     </form>
                 </div>';
-            })
+            })     
             ->setRowId('id')
-            ->rawColumns(['gallery_count', 'action']);
+            ->rawColumns(['action']);
     }
 
     /**
@@ -61,8 +56,7 @@ class ProductDataTable extends DataTable
      */
     public function query(Product $model): QueryBuilder
     {
-        // Eager load everything: brands, categories, shades, AND the new gallery images
-        return $model->newQuery()->with(['brand', 'category', 'shades', 'images']);
+        return $model->newQuery()->with(['brand', 'category', 'shades']);
     }
 
     /**
@@ -74,7 +68,7 @@ class ProductDataTable extends DataTable
                     ->setTableId('product-table')
                     ->columns($this->getColumns())
                     ->minifiedAjax()
-                    ->orderBy(0) // Order by ID descending
+                    ->orderBy(0)
                     ->selectStyleSingle()
                     ->buttons([
                         Button::make('excel'),
@@ -93,10 +87,9 @@ class ProductDataTable extends DataTable
         return [
             Column::make('id'),
             Column::make('name')->title('Product Name'),
-            Column::make('finish')->title('Finish'),
+            // Finish column removed from here
             Column::computed('brand')->title('Brand'),
             Column::computed('category')->title('Category'),
-            Column::computed('gallery_count')->title('Gallery'), // New Column
             Column::computed('price_range')->title('Price Range'),
             Column::computed('action')
                   ->exportable(false)

@@ -8,24 +8,30 @@
         </h2>
         <p class="text-muted">View and manage your registered users and their activity.</p>
     </div>
-
-    <div class="card border-0 shadow-sm overflow-hidden">
+    <div class="card shadow-sm border-0 overflow-hidden">
         <div style="height: 4px; background-color: #ec4899;"></div>
         
-        <div class="card-header bg-white py-3">
-            <h5 class="mb-0 fw-bold text-dark">User Directory</h5>
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-0">
+            <h5 class="mb-0 fw-bold text-dark">
+                User Directory
+            </h5>
         </div>
-
+        
         <div class="card-body p-0">
-            <div class="table-responsive p-4">
-                {{ $dataTable->table(['class' => 'table table-hover align-middle w-100']) }}
+            <div class="table-responsive p-3">
+                {!! $dataTable->table(['class' => 'table table-hover align-middle w-100']) !!}
             </div>
         </div>
     </div>
+
+    <div class="mt-3">
+        <a href="{{ route('products.index') }}" class="text-muted small text-decoration-none">
+            <i class="fas fa-box me-1"></i> Back to Inventory
+        </a>
+    </div>
 </div>
+@endsection
 
 @push('scripts')
-    {{ $dataTable->scripts(attributes: ['type' => 'module']) }}
-    
+    {!! $dataTable->scripts() !!}
 @endpush
-@endsection

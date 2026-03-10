@@ -14,14 +14,19 @@ class CategoryDataTable extends DataTable
             ->eloquent($query)
             ->addColumn('action', function($row) {
                 return '
-                <div class="d-flex">
-                    <a href="'.route('categories.edit', $row->id).'" class="btn btn-sm btn-warning me-2">Edit</a>
-                    <form action="'.route('categories.destroy', $row->id).'" method="POST" onsubmit="return confirm(\'Are you sure?\')">
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="'.route('categories.edit', $row->id).'" class="btn btn-sm btn-outline-secondary" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <form action="'.route('categories.destroy', $row->id).'" method="POST" onsubmit="return confirm(\'Delete this category?\')">
                         '.csrf_field().method_field('DELETE').'
-                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </form>
                 </div>';
             })
+            ->setRowId('id')
             ->rawColumns(['action']);
     }
 
@@ -36,14 +41,14 @@ class CategoryDataTable extends DataTable
                     ->setTableId('category-table')
                     ->columns($this->getColumns())
                     ->minifiedAjax()
-                    ->orderBy(1);
+                    ->orderBy(1); // Order by Name
     }
 
     public function getColumns(): array
     {
         return [
             Column::make('id'),
-            Column::make('name'),
+            Column::make('name')->title('Category Name'),
             Column::computed('action')
                   ->exportable(false)
                   ->printable(false)

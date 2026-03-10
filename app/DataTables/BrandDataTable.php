@@ -14,17 +14,21 @@ class BrandDataTable extends DataTable
             ->eloquent($query)
             ->addColumn('action', function($row) {
                 return '
-                    <div class="d-flex border-0">
-                        <a href="'.route('brands.edit', $row->id).'" class="btn btn-sm btn-warning me-2">Edit</a>
+                    <div class="d-flex justify-content-center gap-2">
+                        <a href="'.route('brands.edit', $row->id).'" class="btn btn-sm btn-outline-secondary" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </a>
                         
-                        <form action="'.route('brands.destroy', $row->id).'" method="POST" onsubmit="return confirm(\'Are you sure?\')">
-                            '.csrf_field().'
-                            '.method_field('DELETE').'
-                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        <form action="'.route('brands.destroy', $row->id).'" method="POST" onsubmit="return confirm(\'Delete this brand?\')">
+                            '.csrf_field().method_field('DELETE').'
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
                         </form>
                     </div>';
             })
-            ->setRowId('id');
+            ->setRowId('id')
+            ->rawColumns(['action']);
     }
 
     public function query(Brand $model)
@@ -45,7 +49,7 @@ class BrandDataTable extends DataTable
     {
         return [
             Column::make('id'),
-            Column::make('name'),
+            Column::make('name')->title('Brand Name'),
             Column::computed('action')
                   ->exportable(false)
                   ->printable(false)
