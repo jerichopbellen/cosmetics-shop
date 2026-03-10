@@ -38,14 +38,14 @@
                             <label class="form-label small fw-bold text-muted text-uppercase">Full Name</label>
                             <input type="text" name="name" 
                                    class="form-control border-pink-focus shadow-none py-2" 
-                                   placeholder="John Doe" value="{{ old('name') }}" required autofocus>
+                                   placeholder="John Doe" value="{{ old('name') }}" autofocus>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label small fw-bold text-muted text-uppercase">Email Address</label>
-                            <input type="email" name="email" 
+                            <input name="email" 
                                    class="form-control border-pink-focus shadow-none py-2" 
-                                   placeholder="name@example.com" value="{{ old('email') }}" required>
+                                   placeholder="name@example.com" value="{{ old('email') }}" autofocus>
                         </div>
 
                         <div class="row">
@@ -53,13 +53,13 @@
                                 <label class="form-label small fw-bold text-muted text-uppercase">Password</label>
                                 <input type="password" name="password" 
                                        class="form-control border-pink-focus shadow-none py-2" 
-                                       placeholder="••••••••" required>
+                                       placeholder="••••••••" >
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Confirm</label>
                                 <input type="password" name="password_confirmation" 
                                        class="form-control border-pink-focus shadow-none py-2" 
-                                       placeholder="••••••••" required>
+                                       placeholder="••••••••" >
                             </div>
                         </div>
 

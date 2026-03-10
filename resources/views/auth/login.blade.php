@@ -17,9 +17,9 @@
                         @csrf
                         <div class="mb-3">
                             <label class="form-label small fw-bold text-muted text-uppercase">Email Address</label>
-                            <input type="email" name="email" 
+                            <input name="email" 
                                    class="form-control border-pink-focus shadow-none py-2" 
-                                   placeholder="name@example.com" required autofocus>
+                                   placeholder="name@example.com" autofocus>
                         </div>
 
                         <div class="mb-3">
@@ -31,7 +31,7 @@
                             </div>
                             <input type="password" name="password" 
                                    class="form-control border-pink-focus shadow-none py-2" 
-                                   placeholder="••••••••" required>
+                                   placeholder="••••••••">
                         </div>
 
                         <div class="mb-4 form-check">
