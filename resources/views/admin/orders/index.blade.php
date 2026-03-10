@@ -10,15 +10,14 @@
             <p class="text-muted">Manage customer purchases and fulfillment status.</p>
         </div>
     </div>
+
     <div class="card shadow-sm border-0 overflow-hidden">
         <div style="height: 4px; background-color: #ec4899;"></div>
         
         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-0">
-            <h5 class="mb-0 fw-bold text-dark">
-                All Orders
-            </h5>
+            <h5 class="mb-0 fw-bold text-dark">All Orders</h5>
             <div style="width: 180px;">
-                <select id="status-filter" class="form-select form-select-sm border-pink">
+                <select id="status-filter" class="form-select form-select-sm border-pink shadow-sm">
                     <option value="">All Statuses</option>
                     <option value="Pending">Pending</option>
                     <option value="Packing">Packing</option>
@@ -49,7 +48,7 @@
     <script type="module">
         $(function() {
             $('#status-filter').on('change', function() {
-                window.LaravelDataTables["order-table"].draw();
+                $('#order-table').DataTable().draw();
             });
         });
     </script>

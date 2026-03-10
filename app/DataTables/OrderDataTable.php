@@ -23,7 +23,6 @@ class OrderDataTable extends DataTable
                 </div>';
             })
             ->editColumn('user_id', function($row) {
-                // Matching the User module style: standard name with muted subtext
                 return '<div>'. $row->user->name .'</div><small class="text-muted">' . $row->user->email . '</small>';
             })
             ->editColumn('status', function($row) {
@@ -43,7 +42,13 @@ class OrderDataTable extends DataTable
 
     public function query(Order $model): QueryBuilder
     {
-        return $model->newQuery()->with('user')->select('orders.*');
+        $query = $model->newQuery()->with('user')->select('orders.*');
+
+        if ($status = request('status')) {
+            $query->where('status', $status);
+        }
+
+        return $query;
     }
 
     public function html(): HtmlBuilder
