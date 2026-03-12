@@ -45,16 +45,16 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td>${{ number_format($item->price, 2) }}</td>
+                                    <td>₱{{ number_format($item->price, 2) }}</td>
                                     <td>{{ $item->quantity }}</td>
-                                    <td class="text-end pe-4 fw-bold">${{ number_format($item->price * $item->quantity, 2) }}</td>
+                                    <td class="text-end pe-4 fw-bold">₱{{ number_format($item->price * $item->quantity, 2) }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>
                             <tfoot class="bg-light">
                                 <tr>
                                     <td colspan="3" class="text-end ps-4 fw-bold py-3">Grand Total:</td>
-                                    <td class="text-end pe-4 fw-bold text-pink fs-5 py-3">${{ number_format($order->total_amount, 2) }}</td>
+                                    <td class="text-end pe-4 fw-bold text-pink fs-5 py-3">₱{{ number_format($order->total_amount, 2) }}</td>
                                 </tr>
                             </tfoot>
                         </table>

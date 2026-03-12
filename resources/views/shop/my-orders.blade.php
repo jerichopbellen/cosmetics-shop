@@ -52,7 +52,7 @@
                                 </span>
                             </div>
                             <div class="col-md-2 fw-bold text-end fs-5 text-dark">
-                                ${{ number_format($order->total_amount, 2) }}
+                                ₱{{ number_format($order->total_amount, 2) }}
                             </div>
                             <div class="col-md-2 text-end">
                                 <button class="btn btn-outline-pink btn-sm fw-bold px-3" data-bs-toggle="collapse" data-bs-target="#details-{{ $order->id }}">
@@ -76,7 +76,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="small fw-bold text-dark">${{ number_format($item->price * $item->quantity, 2) }}</div>
+                                            <div class="small fw-bold text-dark">₱{{ number_format($item->price * $item->quantity, 2) }}</div>
                                         </div>
                                     @endforeach
                                 </div>
@@ -147,7 +147,7 @@
                                 </span>
                             </div>
                             <div class="col-md-2 fw-bold text-end fs-5 text-dark">
-                                ${{ number_format($history->total_amount, 2) }}
+                                ₱{{ number_format($history->total_amount, 2) }}
                             </div>
                             <div class="col-md-2 text-end">
                                 <button class="btn btn-outline-pink btn-sm fw-bold px-3" data-bs-toggle="collapse" data-bs-target="#history-details-{{ $history->id }}">
@@ -171,7 +171,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="small fw-bold text-dark">${{ number_format($item->price * $item->quantity, 2) }}</div>
+                                            <div class="small fw-bold text-dark">₱{{ number_format($item->price * $item->quantity, 2) }}</div>
                                         </div>
                                     @endforeach
                                 </div>

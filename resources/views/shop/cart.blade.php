@@ -43,13 +43,13 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="text-nowrap">${{ number_format($details['price'], 2) }}</td>
+                                            <td class="text-nowrap">₱{{ number_format($details['price'], 2) }}</td>
                                             <td>
                                                 <span class="badge bg-light text-dark border px-3 py-2">
                                                     {{ $details['quantity'] }}
                                                 </span>
                                             </td>
-                                            <td class="fw-bold text-nowrap">${{ number_format($details['price'] * $details['quantity'], 2) }}</td>
+                                            <td class="fw-bold text-nowrap">₱{{ number_format($details['price'] * $details['quantity'], 2) }}</td>
                                             <td class="text-center">
                                                 <form action="{{ route('cart.remove', $key) }}" method="POST" 
                                                       onsubmit="return confirm('Remove this item from your cart?')">
@@ -76,7 +76,7 @@
                         
                         <div class="d-flex justify-content-between mb-2">
                             <span class="text-muted">Subtotal</span>
-                            <span class="fw-bold">${{ number_format($subtotal, 2) }}</span>
+                            <span class="fw-bold">₱{{ number_format($subtotal, 2) }}</span>
                         </div>
                         
                         <div class="d-flex justify-content-between mb-3">
@@ -88,7 +88,7 @@
                         
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <span class="h5 mb-0 fw-bold">Total</span>
-                            <span class="h4 mb-0 text-pink fw-bold">${{ number_format($subtotal, 2) }}</span>
+                            <span class="h4 mb-0 text-pink fw-bold">₱{{ number_format($subtotal, 2) }}</span>
                         </div>
 
                         <div class="d-grid gap-2">

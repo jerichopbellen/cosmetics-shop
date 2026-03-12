@@ -74,7 +74,7 @@
                                             <span class="badge {{ $statusClass }} rounded-pill">{{ $order->status }}</span>
                                         </td>
                                         <td class="text-end pe-4 fw-bold text-dark">
-                                            ${{ number_format($order->total_amount, 2) }}
+                                            ₱{{ number_format($order->total_amount, 2) }}
                                         </td>
                                     </tr>
                                 @empty
@@ -131,7 +131,7 @@
                     <h6 class="fw-bold text-uppercase small text-muted mb-3 tracking-wider">Account Overview</h6>
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted small">Lifetime Spend:</span>
-                        <span class="fw-bold text-pink">${{ number_format($user->orders->where('status', 'Delivered')->sum('total_amount'), 2) }}</span>
+                        <span class="fw-bold text-pink">₱{{ number_format($user->orders->where('status', 'Delivered')->sum('total_amount'), 2) }}</span>
                     </div>
                     <div class="d-flex justify-content-between">
                         <span class="text-muted small">Completed Orders:</span>

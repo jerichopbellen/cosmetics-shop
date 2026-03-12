@@ -57,9 +57,9 @@
                         @endphp
                         <p class="text-pink fw-bold mb-2">
                             @if($minPrice === $maxPrice)
-                                ${{ number_format($minPrice, 2) }}
+                                ₱{{ number_format($minPrice, 2) }}
                             @else
-                                ${{ number_format($minPrice, 2) }} - ${{ number_format($maxPrice, 2) }}
+                                ₱{{ number_format($minPrice, 2) }} - ₱{{ number_format($maxPrice, 2) }}
                             @endif
                         </p>
 
