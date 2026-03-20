@@ -9,6 +9,8 @@ use App\DataTables\OrderDataTable;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Product;
+use App\Models\Brand;
+use App\Models\Category;
 
 class OrderController extends Controller
 {
@@ -57,6 +59,8 @@ class OrderController extends Controller
         $totalOrders = Order::count();
         $totalCustomers = User::where('role', 'customer')->count();
         $totalProducts = Product::count();
+        $totalBrands = Brand::count();
+        $totalCategories = Category::count();
 
         // 1. YEARLY SALES (Line Chart) - YOUR ORIGINAL LOGIC
         $yearlySales = Order::where('status', '!=', 'Cancelled')
@@ -98,7 +102,9 @@ class OrderController extends Controller
             'pieLabels' => $productSales->pluck('name'),
             'pieData' => $productSales->pluck('total_revenue'),
             'start' => $start, 
-            'end' => $end
+            'end' => $end,
+            'totalBrands' => $totalBrands,
+            'totalCategories' => $totalCategories,
         ]);
     }
 }

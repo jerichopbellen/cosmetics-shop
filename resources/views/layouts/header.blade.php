@@ -27,13 +27,6 @@
                 </li>
 
                 @auth
-                    @if(auth()->user()->role === 'admin')
-                        <li class="nav-item">
-                            <a class="nav-link text-dark fw-bold {{ request()->is('admin*') ? 'text-pink' : '' }}" href="{{ route('admin.dashboard') }}">
-                                <i class="fa-solid fa-lock me-1 small"></i> Admin
-                            </a>
-                        </li>
-                    @endif
 
                     <li class="nav-item dropdown ms-lg-3">
                         <a class="nav-link dropdown-toggle text-dark d-flex align-items-center py-0" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
@@ -53,7 +46,7 @@
                             @if(auth()->user()->role === 'admin')
                                 <li><hr class="dropdown-divider opacity-50"></li>
                                 <li class="dropdown-header text-uppercase small fw-bold text-pink" style="font-size: 0.65rem; letter-spacing: 1px;">Management</li>
-                                
+                                <li><a class="dropdown-item py-2" href="{{ route('admin.dashboard') }}"><i class="fa-solid fa-chart-line me-2 opacity-75"></i> Dashboard</a></li>
                                 <li><a class="dropdown-item py-2" href="{{ route('products.index') }}"><i class="fa-solid fa-box me-2 opacity-75"></i> Products</a></li>
                                 <li><a class="dropdown-item py-2" href="{{ route('categories.index') }}"><i class="fa-solid fa-tags me-2 opacity-75"></i> Categories</a></li>
                                 <li><a class="dropdown-item py-2" href="{{ route('brands.index') }}"><i class="fa-solid fa-copyright me-2 opacity-75"></i> Brands</a></li>

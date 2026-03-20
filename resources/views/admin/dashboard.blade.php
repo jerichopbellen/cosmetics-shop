@@ -5,49 +5,88 @@
     <h2 class="fw-bold text-dark mb-4"><i class="fa-solid fa-chart-line me-2 text-pink"></i>Store Analytics</h2>
 
     <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm p-3 info-card">
-                <div class="d-flex align-items-center">
-                    <div class="icon-box bg-soft-pink text-pink"><i class="fa-solid fa-coins"></i></div>
-                    <div class="ms-3">
-                        <small class="text-muted fw-bold">TOTAL SALES</small>
-                        <h4 class="fw-bold mb-0">₱{{ number_format($totalSales, 2) }}</h4>
+        <div class="col-md-4 col-lg-2">
+            <a href="{{ route('admin.dashboard') }}" class="text-decoration-none h-100">
+                <div class="card border-0 shadow-sm p-3 info-card h-100">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box bg-soft-pink text-pink"><i class="fa-solid fa-coins"></i></div>
+                        <div class="ms-3">
+                            <small class="text-muted fw-bold">SALES</small>
+                            <h5 class="fw-bold mb-0">₱{{ number_format($totalSales, 0) }}</h5>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm p-3 info-card">
-                <div class="d-flex align-items-center">
-                    <div class="icon-box bg-soft-blue text-blue"><i class="fa-solid fa-shopping-cart"></i></div>
-                    <div class="ms-3">
-                        <small class="text-muted fw-bold">ORDERS</small>
-                        <h4 class="fw-bold mb-0">{{ number_format($totalOrders) }}</h4>
+
+        <div class="col-md-4 col-lg-2">
+            <a href="{{ route('admin.orders.index') }}" class="text-decoration-none h-100">
+                <div class="card border-0 shadow-sm p-3 info-card h-100">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box bg-soft-blue text-blue"><i class="fa-solid fa-shopping-cart"></i></div>
+                        <div class="ms-3">
+                            <small class="text-muted fw-bold">ORDERS</small>
+                            <h5 class="fw-bold mb-0">{{ number_format($totalOrders) }}</h5>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm p-3 info-card">
-                <div class="d-flex align-items-center">
-                    <div class="icon-box bg-soft-green text-green"><i class="fa-solid fa-users"></i></div>
-                    <div class="ms-3">
-                        <small class="text-muted fw-bold">CUSTOMERS</small>
-                        <h4 class="fw-bold mb-0">{{ number_format($totalCustomers) }}</h4>
+
+        <div class="col-md-4 col-lg-2">
+            <a href="{{ route('products.index') }}" class="text-decoration-none h-100">
+                <div class="card border-0 shadow-sm p-3 info-card h-100">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box bg-soft-orange text-orange"><i class="fa-solid fa-box"></i></div>
+                        <div class="ms-3">
+                            <small class="text-muted fw-bold">PRODUCTS</small>
+                            <h5 class="fw-bold mb-0">{{ number_format($totalProducts) }}</h5>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm p-3 info-card">
-                <div class="d-flex align-items-center">
-                    <div class="icon-box bg-soft-orange text-orange"><i class="fa-solid fa-box"></i></div>
-                    <div class="ms-3">
-                        <small class="text-muted fw-bold">PRODUCTS</small>
-                        <h4 class="fw-bold mb-0">{{ number_format($totalProducts) }}</h4>
+
+        <div class="col-md-4 col-lg-2">
+            <a href="{{ route('brands.index') }}" class="text-decoration-none h-100">
+                <div class="card border-0 shadow-sm p-3 info-card h-100">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box bg-soft-purple text-purple"><i class="fa-solid fa-copyright"></i></div>
+                        <div class="ms-3">
+                            <small class="text-muted fw-bold">BRANDS</small>
+                            <h5 class="fw-bold mb-0">{{ number_format($totalBrands) }}</h5>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </a>
+        </div>
+
+        <div class="col-md-4 col-lg-2">
+            <a href="{{ route('categories.index') }}" class="text-decoration-none h-100">
+                <div class="card border-0 shadow-sm p-3 info-card h-100">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box bg-soft-teal text-teal"><i class="fa-solid fa-layer-group"></i></div>
+                        <div class="ms-3">
+                            <small class="text-muted fw-bold">CATEGORIES</small>
+                            <h5 class="fw-bold mb-0">{{ number_format($totalCategories) }}</h5>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4 col-lg-2">
+            <a href="{{ route('admin.users.index') }}" class="text-decoration-none h-100">
+                <div class="card border-0 shadow-sm p-3 info-card h-100">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box bg-soft-green text-green"><i class="fa-solid fa-users"></i></div>
+                        <div class="ms-3">
+                            <small class="text-muted fw-bold">CUSTOMERS</small>
+                            <h5 class="fw-bold mb-0">{{ number_format($totalCustomers) }}</h5>
+                        </div>
+                    </div>
+                </div>
+            </a>
         </div>
     </div>
 
@@ -213,7 +252,6 @@
 </script>
 
 <style>
-    .info-card { transition: transform 0.2s; }
     .info-card:hover { transform: translateY(-5px); }
     .icon-box { width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 1.25rem; }
     .bg-soft-pink { background: #fce7f3; color: #ec4899; }
@@ -222,6 +260,14 @@
     .bg-soft-orange { background: #ffedd5; color: #f97316; }
     #chart-legend::-webkit-scrollbar { width: 5px; }
     #chart-legend::-webkit-scrollbar-thumb { background: #ec4899; border-radius: 10px; }
+    .bg-soft-purple { background: #f3e8ff; color: #a855f7; }
+    .bg-soft-teal { background: #f0fdfa; color: #14b8a6; }
+    .info-card { transition: all 0.3s cubic-bezier(.25,.8,.25,1); border: 1px solid transparent !important;}
+    a:hover .info-card { 
+        background-color: #fff !important;
+        border-color: #ec4899 !important; /* Pink border on hover */
+        box-shadow: 0 10px 15px -3px rgba(236, 72, 153, 0.1) !important;
+    }
 </style>
 @endpush
 @endsection
