@@ -2,36 +2,72 @@
 
 @section('body')
 <div class="container py-5">
+    {{-- Breadcrumb Navigation --}}
     <div class="mb-4">
         <a href="{{ route('admin.users.index') }}" class="text-decoration-none text-muted small">
-            <i class="fa-solid fa-arrow-left me-1"></i> Back to Users
+            <i class="fa-solid fa-chevron-left me-1"></i> Back to User Directory
         </a>
-        <div class="d-flex justify-content-between align-items-end mt-2">
-            <div>
-                <h2 class="fw-bold mb-0 text-dark">{{ $user->name }}</h2>
-                <p class="text-muted mb-0">{{ $user->email }} • <span class="text-pink">Customer since {{ $user->created_at->format('M Y') }}</span></p>
+    </div>
+
+    {{-- Profile Header Card --}}
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                <div class="d-flex align-items-center">
+                    {{-- Profile Initial Circle --}}
+                    <div class="bg-pink text-white d-flex align-items-center justify-content-center fw-bold rounded-circle shadow-sm me-3" 
+                         style="width: 60px; height: 60px; font-size: 1.5rem; background-color: #ec4899;">
+                        {{ strtoupper(substr($user->name, 0, 1)) }}
+                    </div>
+                    <div>
+                        <h2 class="fw-bold mb-0 text-dark">{{ $user->name }}</h2>
+                        <p class="text-muted mb-0 small">
+                            <i class="fa-regular fa-envelope me-1"></i> {{ $user->email }} 
+                            <span class="mx-2 opacity-25">|</span>
+                            <span class="text-pink" style="color: #ec4899;">Joined {{ $user->created_at->format('M d, Y') }}</span>
+                        </p>
+                    </div>
+                </div>
+
+                {{-- Status & Role Badges - Matching your DataTable Styles --}}
+                <div class="mt-3 mt-md-0 d-flex gap-2">
+                    {{-- Status Badge --}}
+                    @if($user->is_active)
+                        <span class="badge bg-success-subtle text-success border border-success px-3 py-2 rounded-pill shadow-sm" style="font-size: 0.75rem;">
+                            <i class="fa-solid fa-check-circle me-1"></i> ACTIVE
+                        </span>
+                    @else
+                        <span class="badge bg-dark text-white border px-3 py-2 rounded-pill shadow-sm" style="font-size: 0.75rem;">
+                            <i class="fa-solid fa-ban me-1"></i> INACTIVE
+                        </span>
+                    @endif
+
+                    {{-- Role Badge --}}
+                    <span class="badge {{ $user->role === 'admin' ? 'bg-pink text-white' : 'bg-light text-dark border' }} px-3 py-2 text-uppercase rounded-pill shadow-sm" 
+                          style="font-size: 0.75rem; {{ $user->role === 'admin' ? 'background-color: #ec4899 !important;' : '' }}">
+                        {{ strtoupper($user->role) }}
+                    </span>
+                </div>
             </div>
-            <span class="badge {{ $user->role === 'admin' ? 'bg-danger' : 'bg-pink' }} px-3 py-2 text-uppercase rounded-pill shadow-sm">
-                {{ $user->role }}
-            </span>
         </div>
     </div>
 
     <div class="row g-4">
+        {{-- Left: Order History --}}
         <div class="col-lg-8">
-            <div class="card border-0 shadow-sm overflow-hidden">
+            <div class="card border-0 shadow-sm overflow-hidden h-100">
                 <div style="height: 4px; background-color: #ec4899;"></div>
                 <div class="card-header bg-white py-3">
-                    <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-history me-2 text-pink"></i>Order History</h5>
+                    <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-history me-2" style="color: #ec4899;"></i>Order History</h5>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
-                            <thead class="bg-light">
+                            <thead class="bg-light small text-uppercase">
                                 <tr>
-                                    <th class="ps-4 border-0">Order #</th>
-                                    <th class="border-0">Products</th>
-                                    <th class="border-0">Status</th>
+                                    <th class="ps-4 py-3 border-0">Order ID</th>
+                                    <th class="border-0 text-center">Items</th>
+                                    <th class="border-0 text-center">Status</th>
                                     <th class="text-end pe-4 border-0">Total</th>
                                 </tr>
                             </thead>
@@ -39,39 +75,27 @@
                                 @forelse($user->orders as $order)
                                     <tr>
                                         <td class="ps-4">
-                                            <a href="{{ route('admin.orders.show', $order->id) }}" class="fw-bold text-decoration-none text-pink">
-                                                {{ $order->order_number }}
+                                            <a href="{{ route('admin.orders.show', $order->id) }}" class="fw-bold text-decoration-none" style="color: #ec4899;">
+                                                #{{ $order->order_number }}
                                             </a>
-                                            <div class="text-muted small">{{ $order->created_at->format('M d, Y') }}</div>
+                                            <div class="text-muted" style="font-size: 0.7rem;">{{ $order->created_at->format('M d, Y') }}</div>
                                         </td>
-                                        <td>
-                                            <div class="d-flex flex-column gap-2 py-2">
-                                                @foreach($order->orderItems as $item)
-                                                    <div class="d-flex align-items-center">
-                                                        @php
-                                                            $image = $item->shade->product->images->first()->image_path ?? 'placeholders/product.jpg';
-                                                        @endphp
-                                                        <img src="{{ asset('storage/' . $image) }}" 
-                                                             class="rounded border-pink me-2" 
-                                                             style="width: 35px; height: 35px; object-fit: cover;">
-                                                        <span class="small text-dark">
-                                                            {{ $item->shade->product->name }} 
-                                                            <span class="text-muted">({{ $item->quantity }})</span>
-                                                        </span>
-                                                    </div>
-                                                @endforeach
-                                            </div>
+                                        <td class="text-center">
+                                            <span class="badge bg-light text-dark border fw-normal">{{ $order->orderItems->count() }} items</span>
                                         </td>
-                                        <td>
+                                        <td class="text-center">
                                             @php
                                                 $statusClass = match($order->status) {
                                                     'Pending' => 'bg-warning text-dark',
-                                                    'Delivered' => 'bg-success',
-                                                    'Cancelled' => 'bg-danger',
-                                                    default => 'bg-pink'
+                                                    'Delivered' => 'bg-success text-white',
+                                                    'Cancelled' => 'bg-dark text-white',
+                                                    default => 'bg-pink text-white'
                                                 };
                                             @endphp
-                                            <span class="badge {{ $statusClass }} rounded-pill">{{ $order->status }}</span>
+                                            <span class="badge {{ $statusClass }} rounded-pill px-3" 
+                                                  style="font-size: 0.7rem; {{ $order->status === 'Pending' ? '' : ($order->status === 'Delivered' ? '' : 'background-color: #ec4899 !important;') }}">
+                                                {{ strtoupper($order->status) }}
+                                            </span>
                                         </td>
                                         <td class="text-end pe-4 fw-bold text-dark">
                                             ₱{{ number_format($order->total_amount, 2) }}
@@ -92,51 +116,51 @@
             </div>
         </div>
 
+        {{-- Right: Controls --}}
         <div class="col-lg-4">
-            <div class="card border-0 shadow-sm mb-4 overflow-hidden">
-                <div style="height: 4px; background-color: #ec4899;"></div>
-                <div class="card-body p-4">
-                    <h5 class="fw-bold mb-3 text-dark">Update Permissions</h5>
-                    <p class="text-muted small mb-4">Admins have access to the dashboard and management tools.</p>
-                    
-                    <form action="{{ route('admin.users.updateRole', $user->id) }}" method="POST">
-                        @csrf
-                        @method('PATCH')
-                        
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold text-muted text-uppercase">System Role</label>
-                            <select name="role" class="form-select border-pink shadow-none">
-                                <option value="user" {{ $user->role === 'user' ? 'selected' : '' }}>User (Customer)</option>
-                                <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Admin (Full Access)</option>
-                            </select>
-                        </div>
+            {{-- Metrics --}}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4 text-center">
+                    <p class="text-muted small text-uppercase mb-1 tracking-wider">Lifetime Spend</p>
+                    <h3 class="fw-bold mb-0" style="color: #ec4899;">₱{{ number_format($user->orders->where('status', 'Delivered')->sum('total_amount'), 2) }}</h3>
+                </div>
+            </div>
 
-                        <button type="submit" class="btn btn-pink w-100 py-2 fw-bold shadow-sm" 
-                                @if(auth()->id() === $user->id) disabled @endif
-                                onclick="return confirm('Confirm role change for {{ $user->name }}?')">
-                            <i class="fas fa-user-shield me-1"></i> SAVE CHANGES
-                        </button>
-                        
-                        @if(auth()->id() === $user->id)
-                            <small class="text-danger d-block mt-3 text-center fst-italic">
-                                <i class="fas fa-exclamation-triangle me-1"></i> You cannot change your own role.
-                            </small>
-                        @endif
+            {{-- Role Control --}}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <label class="fw-bold text-dark small mb-3 text-uppercase tracking-wider">System Access</label>
+                    <form action="{{ route('admin.users.updateRole', $user->id) }}" method="POST">
+                        @csrf @method('PATCH')
+                        <div class="input-group">
+                            <select name="role" class="form-select shadow-none" style="border-color: #ec4899;">
+                                <option value="customer" {{ $user->role === 'customer' ? 'selected' : '' }}>Customer</option>
+                                <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Admin</option>
+                            </select>
+                            <button class="btn text-white" type="submit" style="background-color: #ec4899;" @if(auth()->id()===$user->id) disabled @endif>
+                                <i class="fa-solid fa-save"></i>
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
 
-            <div class="card border-0 shadow-sm bg-white overflow-hidden">
-                <div style="height: 4px; background-color: #343a40;"></div> <div class="card-body p-4">
-                    <h6 class="fw-bold text-uppercase small text-muted mb-3 tracking-wider">Account Overview</h6>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted small">Lifetime Spend:</span>
-                        <span class="fw-bold text-pink">₱{{ number_format($user->orders->where('status', 'Delivered')->sum('total_amount'), 2) }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <span class="text-muted small">Completed Orders:</span>
-                        <span class="fw-bold text-dark">{{ $user->orders->where('status', 'Delivered')->count() }}</span>
-                    </div>
+            {{-- Status Control --}}
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <label class="fw-bold text-dark small mb-3 text-uppercase tracking-wider">Account Status</label>
+                    <form action="{{ route('admin.users.updateStatus', $user->id) }}" method="POST">
+                        @csrf @method('PATCH')
+                        <div class="input-group">
+                            <select name="is_active" class="form-select shadow-none" style="border-color: {{ $user->is_active ? '#198754' : '#212529' }};">
+                                <option value="1" {{ $user->is_active ? 'selected' : '' }}>Active</option>
+                                <option value="0" {{ !$user->is_active ? 'selected' : '' }}>Inactive</option>
+                            </select>
+                            <button class="btn {{ $user->is_active ? 'btn-success' : 'btn-dark' }}" type="submit" @if(auth()->id()===$user->id) disabled @endif>
+                                <i class="fa-solid fa-power-off"></i>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

@@ -52,11 +52,18 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        if (Auth::attempt($credentials, $request->remember)) {
+        if (Auth::attempt($credentials, (bool) $request->input('remember'))) {
+            $user = Auth::user();
+            
+            if (!$user->is_active) {
+                Auth::logout();
+                return back()->withErrors(['email' => 'Your account has been deactivated.']);
+            }
+            
             $request->session()->regenerate();
 
             // Redirect based on role
-            if (Auth::user()->role === 'admin') {
+            if ($user->role === 'admin') {
                 return redirect()->intended('/admin/dashboard');
             }
             return redirect()->intended('/');

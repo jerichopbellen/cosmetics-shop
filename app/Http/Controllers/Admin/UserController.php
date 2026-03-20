@@ -24,17 +24,41 @@ class UserController extends Controller
 
     public function updateRole(Request $request, User $user)
     {
-        // Prevent admins from accidentally de-promoting themselves
+        // Prevent admins from changing their own role to stay in the system
         if (Auth::id() === $user->id) {
-            return redirect()->back()->with('error', 'You cannot change your own role.');
+            return redirect()->back()->with('error', 'You cannot change your own administrative role.');
+        }
+
+        // Validate the role input
+        $request->validate([
+            'role' => 'required|in:customer,admin',
+        ]);
+
+        // Update only the role column
+        $user->update([
+            'role' => $request->role
+        ]);
+
+        $roleName = strtoupper($request->role);
+
+        return redirect()->back()->with('success', "Role for {$user->name} has been updated to {$roleName}.");
+    }
+
+    public function updateStatus(Request $request, User $user)
+    {
+        if (Auth::id() === $user->id) {
+            return redirect()->back()->with('error', 'You cannot deactivate your own account.');
         }
 
         $request->validate([
-            'role' => 'required|in:user,admin',
+            'is_active' => 'required|in:0,1', 
         ]);
 
-        $user->update(['role' => $request->role]);
+        $user->is_active = filter_var($request->is_active, FILTER_VALIDATE_BOOLEAN);
+        $user->save();
 
-        return redirect()->back()->with('success', "Role for {$user->name} updated to {$request->role}.");
+        $status = $user->is_active ? 'activated' : 'deactivated';
+
+        return redirect()->back()->with('success', "User '{$user->name}' has been successfully {$status}.");
     }
 }

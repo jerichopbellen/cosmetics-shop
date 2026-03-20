@@ -21,13 +21,38 @@ class UserDataTable extends DataTable
             })
             ->editColumn('created_at', fn($user) => $user->created_at->format('M d, Y'))
             ->editColumn('role', function($user) {
-                // Using a softer pink-themed badge for admin to match the site
                 $class = $user->role === 'admin' ? 'bg-pink text-white' : 'bg-light text-dark border';
                 return '<span class="badge ' . $class . '" style="font-size: 0.75rem;">' . strtoupper($user->role) . '</span>';
             })
-            // Using the eager-loaded count directly
+            // --- ADDED STATUS COLUMN ---
+            ->editColumn('is_active', function($user) {
+                if ($user->is_active) {
+                    return '<span class="badge bg-success-subtle text-success border border-success px-2" style="font-size: 0.7rem;">
+                                <i class="fas fa-check me-1"></i> ACTIVE
+                            </span>';
+                }
+                return '<span class="badge bg-dark text-white px-2" style="font-size: 0.7rem;">
+                            <i class="fas fa-ban me-1"></i> INACTIVE
+                        </span>';
+            })
             ->addColumn('total_orders', fn($user) => $user->orders_count ?? 0)
-            ->rawColumns(['action', 'role']);
+            // Add 'is_active' to rawColumns so the HTML renders
+            ->rawColumns(['action', 'role', 'is_active']);
+    }
+
+    public function getColumns(): array
+    {
+        return [
+            ['data' => 'id', 'title' => 'ID', 'width' => '50px'],
+            ['data' => 'name', 'title' => 'Customer Name'],
+            ['data' => 'email', 'title' => 'Email Address'],
+            ['data' => 'role', 'title' => 'Role', 'addClass' => 'text-center'],
+            // --- ADDED TO COLUMNS ARRAY ---
+            ['data' => 'is_active', 'title' => 'Status', 'addClass' => 'text-center'],
+            ['data' => 'total_orders', 'title' => 'Orders', 'addClass' => 'text-center'],
+            ['data' => 'created_at', 'title' => 'Joined'],
+            ['data' => 'action', 'title' => 'Action', 'orderable' => false, 'searchable' => false, 'addClass' => 'text-center'],
+        ];
     }
 
     public function query(User $model)
@@ -43,18 +68,5 @@ class UserDataTable extends DataTable
             ->columns($this->getColumns())
             ->minifiedAjax()
             ->orderBy(0);
-    }
-
-    public function getColumns(): array
-    {
-        return [
-            ['data' => 'id', 'title' => 'ID', 'width' => '50px'],
-            ['data' => 'name', 'title' => 'Customer Name'],
-            ['data' => 'email', 'title' => 'Email Address'],
-            ['data' => 'role', 'title' => 'Role', 'addClass' => 'text-center'],
-            ['data' => 'total_orders', 'title' => 'Orders', 'addClass' => 'text-center'],
-            ['data' => 'created_at', 'title' => 'Joined'],
-            ['data' => 'action', 'title' => 'Action', 'orderable' => false, 'searchable' => false, 'addClass' => 'text-center'],
-        ];
     }
 }

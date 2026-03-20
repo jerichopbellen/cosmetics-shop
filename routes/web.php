@@ -52,6 +52,7 @@ Route::middleware(['auth', 'admin'])
         Route::get('/users', [UserController::class, 'index'])->name('admin.users.index');
         Route::get('/users/{user}', [UserController::class, 'show'])->name('admin.users.show');
         Route::patch('/users/{user}/role', [UserController::class, 'updateRole'])->name('admin.users.updateRole');
+        Route::patch('/users/{user}/status', [UserController::class, 'updateStatus'])->name('admin.users.updateStatus');
         Route::post('/admin/products/import', [ProductController::class, 'import'])->name('products.import');
 
 });
