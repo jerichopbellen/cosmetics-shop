@@ -11,6 +11,8 @@ use App\Models\ProductImage;
 use App\DataTables\ProductDataTable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Imports\ProductsImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductController extends Controller
 {
@@ -153,5 +155,21 @@ class ProductController extends Controller
         $product->shades()->whereNotIn('id', $keepShadeIds)->delete();
 
         return redirect()->route('products.index')->with('success', 'Product and shades updated successfully!');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv'
+        ]);
+
+        try {
+            // ✅ Pass the UploadedFile object directly
+            Excel::import(new ProductsImport, $request->file('file'));
+
+            return redirect()->back()->with('success', 'Products imported successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error during import: ' . $e->getMessage());
+        }
     }
 }

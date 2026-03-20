@@ -52,5 +52,14 @@ Route::middleware(['auth', 'admin'])
         Route::get('/users', [UserController::class, 'index'])->name('admin.users.index');
         Route::get('/users/{user}', [UserController::class, 'show'])->name('admin.users.show');
         Route::patch('/users/{user}/role', [UserController::class, 'updateRole'])->name('admin.users.updateRole');
+        Route::post('/admin/products/import', [ProductController::class, 'import'])->name('products.import');
 
+});
+
+Route::get('/test-zip', function () {
+    return class_exists('ZipArchive') ? 'ZipArchive is enabled' : 'ZipArchive missing';
+});
+
+Route::get('/php-info', function() {
+    phpinfo();
 });
