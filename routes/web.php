@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReviewController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Verified;
@@ -60,6 +61,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/profile-update/{user}', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile/avatar/{user}', [ProfileController::class, 'deleteAvatar'])->name('profile.avatar.delete');
     Route::patch('/orders/{order}/cancel', [ShopController::class, 'cancel'])->name('orders.cancel');
+    Route::get('/reviews/create/{product}', [ReviewController::class, 'create'])->name('reviews.create');
+    Route::post('/reviews/store/{product}', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::get('/reviews/edit/{review}', [ReviewController::class, 'edit'])->name('reviews.edit');
+    Route::put('/reviews/update/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+    Route::delete('/reviews/destroy/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');

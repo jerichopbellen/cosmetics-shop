@@ -11,5 +11,9 @@ class Shade extends Model
         return $this->belongsTo(Product::class);
     }
     
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
     protected $guarded = []; // This allows all fields to be filled
 }

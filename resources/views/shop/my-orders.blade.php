@@ -3,20 +3,21 @@
 @section('body')
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold mb-0">My Orders</h2>
-        <a href="{{ route('shop.index') }}" class="btn btn-outline-pink btn-sm">
+        <h2 class="fw-bold mb-0 text-dark">My Orders</h2>
+        <a href="{{ route('shop.index') }}" class="btn btn-outline-pink btn-sm px-4 fw-bold">
             <i class="fa-solid fa-plus me-2"></i>New Order
         </a>
     </div>
 
+    {{-- Navigation Tabs --}}
     <ul class="nav nav-tabs border-bottom border-2" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active px-4 py-3" id="active-tab" data-bs-toggle="tab" data-bs-target="#active-content" type="button" role="tab">
+            <button class="nav-link active px-4 py-3 fw-bold" id="active-tab" data-bs-toggle="tab" data-bs-target="#active-content" type="button" role="tab">
                 <i class="fa-solid fa-box-open me-2"></i>Active Shipments
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link px-4 py-3" id="history-tab" data-bs-toggle="tab" data-bs-target="#history-content" type="button" role="tab">
+            <button class="nav-link px-4 py-3 fw-bold" id="history-tab" data-bs-toggle="tab" data-bs-target="#history-content" type="button" role="tab">
                 <i class="fa-solid fa-clock-rotate-left me-2"></i>Order History
             </button>
         </li>
@@ -29,16 +30,16 @@
                 <div class="card border-0 shadow-sm mb-3 overflow-hidden">
                     <div style="height: 4px; background-color: #ec4899;"></div>
                     <div class="card-body">
-                        <div class="row align-items-center">
+                        <div class="row align-items-center text-center text-md-start">
                             <div class="col-md-3">
                                 <span class="text-muted small text-uppercase fw-semibold">Order #</span>
                                 <div class="fw-bold text-pink fs-5">{{ $order->order_number }}</div>
                             </div>
                             <div class="col-md-2">
                                 <span class="text-muted small text-uppercase fw-semibold">Date</span>
-                                <div class="text-dark">{{ $order->created_at->format('M d, Y') }}</div>
+                                <div class="text-dark fw-medium">{{ $order->created_at->format('M d, Y') }}</div>
                             </div>
-                            <div class="col-md-3 text-center">
+                            <div class="col-md-3">
                                 @php
                                     $statusColor = match($order->status) {
                                         'Pending' => 'bg-warning text-dark',
@@ -51,10 +52,10 @@
                                     {{ $order->status }}
                                 </span>
                             </div>
-                            <div class="col-md-2 fw-bold text-end fs-5 text-dark">
+                            <div class="col-md-2 fw-bold fs-5 text-dark">
                                 ₱{{ number_format($order->total_amount, 2) }}
                             </div>
-                            <div class="col-md-2 text-end">
+                            <div class="col-md-2 text-md-end mt-3 mt-md-0">
                                 <button class="btn btn-outline-pink btn-sm fw-bold px-3" data-bs-toggle="collapse" data-bs-target="#details-{{ $order->id }}">
                                     DETAILS <i class="fa-solid fa-chevron-down ms-1 small"></i>
                                 </button>
@@ -62,21 +63,24 @@
                         </div>
 
                         <div class="collapse mt-3 pt-3 border-top" id="details-{{ $order->id }}">
-                            <div class="row g-4 text-start">
+                            <div class="row g-4">
                                 <div class="col-lg-7">
                                     <h6 class="fw-bold text-uppercase small text-muted mb-3">Items Ordered</h6>
                                     @foreach($order->orderItems as $item)
                                         <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <div class="d-flex align-items-center text-start">
-                                                <img src="{{ asset('storage/' . ($item->shade->image_path ?? 'placeholders/product.png')) }}" class="rounded border border-pink p-1 me-3" style="width: 50px; height: 50px; object-fit: cover;">
-                                                <div class="small text-start">
+                                            <div class="d-flex align-items-center">
+                                                <img src="{{ asset('storage/' . ($item->shade->image_path ?? 'placeholders/product.png')) }}" 
+                                                     class="rounded border border-pink p-1 me-3" 
+                                                     style="width: 50px; height: 50px; object-fit: cover;">
+                                                <div>
                                                     <div class="fw-bold text-dark">{{ $item->shade->product->name }}</div>
-                                                    <div class="text-muted small">
-                                                        <span class="text-pink fw-semibold">{{ $item->shade->shade_name }}</span> | Qty: {{ $item->quantity }}
+                                                    <div class="small">
+                                                        <span class="text-pink fw-semibold">{{ $item->shade->shade_name }}</span> 
+                                                        <span class="text-muted">| Qty: {{ $item->quantity }}</span>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="small fw-bold text-dark">₱{{ number_format($item->price * $item->quantity, 2) }}</div>
+                                            <div class="fw-bold text-dark">₱{{ number_format($item->price * $item->quantity, 2) }}</div>
                                         </div>
                                     @endforeach
                                 </div>
@@ -96,16 +100,13 @@
 
                                         @if(in_array($order->status, ['Pending', 'Packing']))
                                             <div class="mt-4 pt-3 border-top border-pink-subtle">
-                                                <form action="{{ route('orders.cancel', $order->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?')">
+                                                <form action="{{ route('orders.cancel', $order->id) }}" method="POST" onsubmit="return confirm('Are you sure?')">
                                                     @csrf
                                                     @method('PATCH')
                                                     <button type="submit" class="btn btn-sm btn-danger w-100 fw-bold">
                                                         <i class="fa-solid fa-xmark me-2"></i>CANCEL ORDER
                                                     </button>
                                                 </form>
-                                                <small class="text-muted d-block mt-1" style="font-size: 0.7rem;">
-                                                    *Orders can only be cancelled while "Pending" or "Packing".
-                                                </small>
                                             </div>
                                         @endif
                                     </div>
@@ -125,16 +126,16 @@
                 <div class="card border-0 shadow-sm mb-3 overflow-hidden">
                     <div style="height: 4px; background-color: #ec4899;"></div> 
                     <div class="card-body">
-                        <div class="row align-items-center">
+                        <div class="row align-items-center text-center text-md-start">
                             <div class="col-md-3">
                                 <span class="text-muted small text-uppercase fw-semibold">Order #</span>
                                 <div class="fw-bold text-pink fs-5">{{ $history->order_number }}</div>
                             </div>
                             <div class="col-md-2">
                                 <span class="text-muted small text-uppercase fw-semibold">Date</span>
-                                <div class="text-dark">{{ $history->created_at->format('M d, Y') }}</div>
+                                <div class="text-dark fw-medium">{{ $history->created_at->format('M d, Y') }}</div>
                             </div>
-                            <div class="col-md-3 text-center">
+                            <div class="col-md-3">
                                 @php
                                     $historyStatusColor = match($history->status) {
                                         'Delivered' => 'bg-success text-white',
@@ -146,10 +147,10 @@
                                     {{ $history->status }}
                                 </span>
                             </div>
-                            <div class="col-md-2 fw-bold text-end fs-5 text-dark">
+                            <div class="col-md-2 fw-bold fs-5 text-dark">
                                 ₱{{ number_format($history->total_amount, 2) }}
                             </div>
-                            <div class="col-md-2 text-end">
+                            <div class="col-md-2 text-md-end mt-3 mt-md-0">
                                 <button class="btn btn-outline-pink btn-sm fw-bold px-3" data-bs-toggle="collapse" data-bs-target="#history-details-{{ $history->id }}">
                                     DETAILS <i class="fa-solid fa-chevron-down ms-1 small"></i>
                                 </button>
@@ -157,27 +158,54 @@
                         </div>
 
                         <div class="collapse mt-3 pt-3 border-top" id="history-details-{{ $history->id }}">
-                            <div class="row g-4 text-start">
+                            <div class="row g-4">
                                 <div class="col-lg-7">
                                     <h6 class="fw-bold text-uppercase small text-muted mb-3">Items Purchased</h6>
                                     @foreach($history->orderItems as $item)
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <div class="d-flex align-items-center">
-                                                <img src="{{ asset('storage/' . ($item->shade->image_path ?? 'placeholders/product.png')) }}" class="rounded border border-pink p-1 me-3" style="width: 50px; height: 50px; object-fit: cover;">
-                                                <div class="small">
+                                                <img src="{{ asset('storage/' . ($item->shade->image_path ?? 'placeholders/product.png')) }}" 
+                                                     class="rounded border border-pink p-1 me-3" 
+                                                     style="width: 50px; height: 50px; object-fit: cover;">
+                                                <div>
                                                     <div class="fw-bold text-dark">{{ $item->shade->product->name }}</div>
-                                                    <div class="text-muted small">
-                                                        <span class="text-pink fw-semibold">{{ $item->shade->shade_name }}</span> | Qty: {{ $item->quantity }}
+                                                    <div class="small">
+                                                        <span class="text-pink fw-semibold">{{ $item->shade->shade_name }}</span> 
+                                                        <span class="text-muted">| Qty: {{ $item->quantity }}</span>
                                                     </div>
+                                                    
+                                                    @if($history->status === 'Delivered')
+                                                        <div class="mt-2">
+                                                            @php
+                                                                // Check if this specific shade/product combo was already reviewed by the user
+                                                                $existingReview = \App\Models\Review::where('user_id', auth()->id())
+                                                                    ->where('product_id', $item->shade->product_id)
+                                                                    ->where('shade_id', $item->shade_id)
+                                                                    ->first();
+                                                            @endphp
+
+                                                            @if($existingReview)
+                                                                {{-- Edit Button --}}
+                                                                <a href="{{ route('reviews.edit', $existingReview->id) }}" class="text-primary text-decoration-none small fw-bold">
+                                                                    <i class="fa-solid fa-pen-to-square me-1"></i> Edit Review
+                                                                </a>
+                                                            @else
+                                                                {{-- Create Button --}}
+                                                                <a href="{{ route('reviews.create', ['product' => $item->shade->product_id, 'shade' => $item->shade_id]) }}" class="text-pink text-decoration-none small fw-bold">
+                                                                    <i class="fa-solid fa-star me-1"></i> Write a Review
+                                                                </a>
+                                                            @endif
+                                                        </div>
+                                                    @endif
                                                 </div>
                                             </div>
-                                            <div class="small fw-bold text-dark">₱{{ number_format($item->price * $item->quantity, 2) }}</div>
+                                            <div class="fw-bold text-dark">₱{{ number_format($item->price * $item->quantity, 2) }}</div>
                                         </div>
                                     @endforeach
                                 </div>
                                 <div class="col-lg-5">
                                     <div class="bg-light p-3 rounded h-100 border-start border-pink border-4">
-                                        <h6 class="fw-bold text-uppercase small text-muted mb-2">Shipping Address</h6>
+                                        <h6 class="fw-bold text-uppercase small text-muted mb-2">Shipping Details</h6>
                                         <div class="small text-dark lh-sm">
                                             <strong>{{ $history->first_name }} {{ $history->last_name }}</strong><br>
                                             {{ $history->address }}<br>

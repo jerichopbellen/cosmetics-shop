@@ -15,5 +15,11 @@ class Review extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function shade()
+    {
+        return $this->belongsTo(Shade::class);
+    }
+
     protected $guarded = []; // This allows all fields to be filled
 }

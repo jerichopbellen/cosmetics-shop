@@ -50,16 +50,20 @@ class ShopController extends Controller
      */
     public function show(Product $product)
     {
-        // Load relations for the specific product
-        $product->load(['brand', 'category', 'shades', 'images']);
+        // Load relations including the nested review details
+        $product->load([
+            'brand', 
+            'category', 
+            'shades', 
+            'images',
+            'reviews' => function($query) {
+                $query->latest();
+            },
+            'reviews.user', 
+            'reviews.shade'  
+        ]);
         
-        // Get related products (same category) for the "You May Also Like" section
-        $relatedProducts = Product::where('category_id', $product->category_id)
-            ->where('id', '!=', $product->id)
-            ->limit(4)
-            ->get();
-
-        return view('shop.show', compact('product', 'relatedProducts'));
+        return view('shop.show', compact('product'));
     }
 
     public function addToCart(Request $request)
