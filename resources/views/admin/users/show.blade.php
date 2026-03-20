@@ -29,9 +29,18 @@
                     </div>
                 </div>
 
-                {{-- Status & Role Badges - Matching your DataTable Styles --}}
                 <div class="mt-3 mt-md-0 d-flex gap-2">
                     {{-- Status Badge --}}
+                    {{-- Verification Badge --}}
+                    @if($user->email_verified_at)
+                        <span class="badge bg-info-subtle text-info border border-info px-3 py-2 rounded-pill shadow-sm" style="font-size: 0.75rem;">
+                            <i class="fa-solid fa-envelope-circle-check me-1"></i> VERIFIED
+                        </span>
+                    @else
+                        <span class="badge bg-warning-subtle text-warning border border-warning px-3 py-2 rounded-pill shadow-sm" style="font-size: 0.75rem;">
+                            <i class="fa-solid fa-hourglass-half me-1"></i> PENDING VERIFICATION
+                        </span>
+                    @endif
                     @if($user->is_active)
                         <span class="badge bg-success-subtle text-success border border-success px-3 py-2 rounded-pill shadow-sm" style="font-size: 0.75rem;">
                             <i class="fa-solid fa-check-circle me-1"></i> ACTIVE
