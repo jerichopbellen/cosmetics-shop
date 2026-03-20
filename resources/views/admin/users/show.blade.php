@@ -14,11 +14,15 @@
         <div class="card-body p-4">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
                 <div class="d-flex align-items-center">
-                    {{-- Profile Initial Circle --}}
-                    <div class="bg-pink text-white d-flex align-items-center justify-content-center fw-bold rounded-circle shadow-sm me-3" 
-                         style="width: 60px; height: 60px; font-size: 1.5rem; background-color: #ec4899;">
-                        {{ strtoupper(substr($user->name, 0, 1)) }}
-                    </div>
+                    {{-- Profile Image / Initial Logic --}}
+                    @if($user->image_path)
+                        <img src="{{ asset('storage/' . $user->image_path) }}" alt="{{ $user->name }}" class="rounded-circle shadow-sm me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                    @else
+                        <div class="bg-pink text-white d-flex align-items-center justify-content-center fw-bold rounded-circle shadow-sm me-3" 
+                             style="width: 60px; height: 60px; font-size: 1.5rem; background-color: #ec4899;">
+                            {{ strtoupper(substr($user->name, 0, 1)) }}
+                        </div>
+                    @endif
                     <div>
                         <h2 class="fw-bold mb-0 text-dark">{{ $user->name }}</h2>
                         <p class="text-muted mb-0 small">
@@ -30,17 +34,20 @@
                 </div>
 
                 <div class="mt-3 mt-md-0 d-flex gap-2">
-                    {{-- Status Badge --}}
-                    {{-- Verification Badge --}}
+                    {{-- Readable Soft Verification Badges --}}
                     @if($user->email_verified_at)
-                        <span class="badge bg-info-subtle text-info border border-info px-3 py-2 rounded-pill shadow-sm" style="font-size: 0.75rem;">
+                        {{-- Darker Blue text (#004085) for high readability --}}
+                        <span class="badge bg-info-subtle border border-info px-3 py-2 rounded-pill shadow-sm" style="font-size: 0.75rem; color: #004085;">
                             <i class="fa-solid fa-envelope-circle-check me-1"></i> VERIFIED
                         </span>
                     @else
-                        <span class="badge bg-warning-subtle text-warning border border-warning px-3 py-2 rounded-pill shadow-sm" style="font-size: 0.75rem;">
+                        {{-- Darker Golden text (#856404) for high readability --}}
+                        <span class="badge bg-warning-subtle border border-warning px-3 py-2 rounded-pill shadow-sm" style="font-size: 0.75rem; color: #856404;">
                             <i class="fa-solid fa-hourglass-half me-1"></i> PENDING VERIFICATION
                         </span>
                     @endif
+
+                    {{-- Original Status Badge (Green) --}}
                     @if($user->is_active)
                         <span class="badge bg-success-subtle text-success border border-success px-3 py-2 rounded-pill shadow-sm" style="font-size: 0.75rem;">
                             <i class="fa-solid fa-check-circle me-1"></i> ACTIVE
@@ -51,7 +58,7 @@
                         </span>
                     @endif
 
-                    {{-- Role Badge --}}
+                    {{-- Original Role Badge (Pink) --}}
                     <span class="badge {{ $user->role === 'admin' ? 'bg-pink text-white' : 'bg-light text-dark border' }} px-3 py-2 text-uppercase rounded-pill shadow-sm" 
                           style="font-size: 0.75rem; {{ $user->role === 'admin' ? 'background-color: #ec4899 !important;' : '' }}">
                         {{ strtoupper($user->role) }}
@@ -62,9 +69,10 @@
     </div>
 
     <div class="row g-4">
-        {{-- Left: Order History --}}
+        {{-- Left: Order History & Activity --}}
         <div class="col-lg-8">
-            <div class="card border-0 shadow-sm overflow-hidden h-100">
+            {{-- Order History Card --}}
+            <div class="card border-0 shadow-sm overflow-hidden mb-4 h-100">
                 <div style="height: 4px; background-color: #ec4899;"></div>
                 <div class="card-header bg-white py-3">
                     <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-history me-2" style="color: #ec4899;"></i>Order History</h5>
