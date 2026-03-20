@@ -52,6 +52,7 @@
                                 <li><a class="dropdown-item py-2" href="{{ route('brands.index') }}"><i class="fa-solid fa-copyright me-2 opacity-75"></i> Brands</a></li>
                                 <li><a class="dropdown-item py-2" href="{{ route('admin.orders.index') }}"><i class="fa-solid fa-receipt me-2 opacity-75"></i> Orders</a></li>
                                 <li><a class="dropdown-item py-2" href="{{ route('admin.users.index') }}"><i class="fa-solid fa-user-shield me-2 opacity-75"></i> Users</a></li>
+                                <li><a class="dropdown-item py-2" href="{{ route('reviews.index') }}"><i class="fa-solid fa-star me-2 opacity-75"></i> Reviews</a></li>
                             @endif
 
                             <li><hr class="dropdown-divider opacity-50"></li>
