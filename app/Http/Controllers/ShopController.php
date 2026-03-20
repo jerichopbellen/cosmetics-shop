@@ -18,17 +18,29 @@ class ShopController extends Controller
      */
     public function index(Request $request)
     {
-        // Eager load relations to prevent N+1 query issues
-        $query = Product::with(['brand', 'category', 'shades', 'images']);
+        $searchTerm = $request->input('search');
 
-        // Optional: Filter by category if passed in URL
-        if ($request->has('category')) {
-            $query->whereHas('category', function($q) use ($request) {
-                $q->where('slug', $request->category);
-            });
-        }
-
-        $products = $query->latest()->simplePaginate(12);
+        $products = Product::query()
+            // Eager load everything to prevent N+1 issues
+            ->with(['brand', 'category', 'shades', 'images'])
+            ->when($searchTerm, function ($query, $searchTerm) {
+                $query->where(function ($q) use ($searchTerm) {
+                    // Search in Products table
+                    $q->where('name', 'like', "%{$searchTerm}%")
+                      ->orWhere('description', 'like', "%{$searchTerm}%")
+                      // Search in Brands table
+                      ->orWhereHas('brand', function ($brandQuery) use ($searchTerm) {
+                          $brandQuery->where('name', 'like', "%{$searchTerm}%");
+                      })
+                      // Search in Categories table
+                      ->orWhereHas('category', function ($catQuery) use ($searchTerm) {
+                          $catQuery->where('name', 'like', "%{$searchTerm}%");
+                      });
+                });
+            })
+            ->latest()
+            ->simplePaginate(12)
+            ->withQueryString();
 
         return view('shop.index', compact('products'));
     }

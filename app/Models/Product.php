@@ -3,9 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Product extends Model
 {
+    use HasFactory;
+
+    protected $guarded = [];
+
     public function brand()
     {
         return $this->belongsTo(Brand::class);
@@ -26,8 +31,8 @@ class Product extends Model
         return $this->hasMany(Review::class);
     }
 
-    public function images() {
+    public function images() 
+    {
         return $this->hasMany(ProductImage::class);
     }
-    protected $guarded = []; // This allows all fields to be filled
 }
