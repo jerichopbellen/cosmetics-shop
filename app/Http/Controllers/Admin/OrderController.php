@@ -11,6 +11,10 @@ use App\Models\User;
 use App\Models\Product;
 use App\Models\Brand;
 use App\Models\Category;
+use Illuminate\Support\Facades\Mail;
+use App\Http\Controllers\Exception;
+use Illuminate\Support\Facades\Log;
+use App\Mail\OrderStatusUpdated;
 
 class OrderController extends Controller
 {
@@ -44,6 +48,12 @@ class OrderController extends Controller
             'status' => $request->status,
             'tracking_id' => $request->tracking_id,
         ]);
+
+        try {
+            Mail::to($order->user->email)->send(new OrderStatusUpdated($order));
+        } catch (\Exception $e) {
+            Log::error("Status Update Email Failed: " . $e->getMessage());
+        }
 
         return redirect()->back()->with('success', 'Order status updated successfully!');
     }
