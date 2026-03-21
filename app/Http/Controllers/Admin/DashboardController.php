@@ -6,12 +6,15 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+// Models
 use App\Models\Order;
 use App\Models\User;
 use App\Models\Product;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Review; // Added Review Model
 
+// Charts
 use App\Charts\SalesPerformanceChart;
 use App\Charts\YearlyRevenueChart;
 use App\Charts\ProductShareChart;
@@ -25,15 +28,17 @@ class DashboardController extends Controller
         $pink = '#ec4899';
 
         // --- 1. Information Card Data ---
-        $totalSales = Order::where('status', '!=', 'Cancelled')->sum('total_amount');
+        $totalSales = Order::where('status', '=', 'Delivered')->sum('total_amount');
         $totalOrders = Order::count();
         $totalCustomers = User::where('role', 'customer')->count();
         $totalProducts = Product::count();
         $totalBrands = Brand::count();
         $totalCategories = Category::count();
+        $averageRating = Review::avg('rating') ?? 0;
+        $totalReviews = Review::count();
 
         // --- 2. Yearly Sales (Line Chart) ---
-        $yearlySalesData = Order::where('status', '!=', 'Cancelled')
+        $yearlySalesData = Order::where('status', '=', 'Delivered')
             ->selectRaw('YEAR(created_at) as year, SUM(total_amount) as total')
             ->groupBy('year')
             ->orderBy('year', 'asc')
@@ -46,7 +51,7 @@ class DashboardController extends Controller
             ->backgroundColor('rgba(236, 72, 153, 0.1)');
 
         // --- 3. Range Sales (Bar Chart) ---
-        $barQuery = Order::where('status', '!=', 'Cancelled')
+        $barQuery = Order::where('status', '=', 'Delivered')
             ->selectRaw('DATE(created_at) as date, SUM(total_amount) as total');
         
         if ($start && $end) {
@@ -65,13 +70,12 @@ class DashboardController extends Controller
             ->join('shades', 'order_items.shade_id', '=', 'shades.id')
             ->join('products', 'shades.product_id', '=', 'products.id')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
-            ->where('orders.status', '!=', 'Cancelled')
+            ->where('orders.status', '=', 'Delivered')
             ->select('products.name', DB::raw('SUM(order_items.price * order_items.quantity) as total_revenue'))
             ->groupBy('products.name')
             ->orderByDesc('total_revenue')
             ->get();
 
-        // Generate dynamic shades of pink for the Pie Chart
         $pieColors = $productSales->map(function($item, $i) {
             return "hsl(330, 75%, " . max(25, 85 - ($i * 3.5)) . "%)";
         })->toArray();
@@ -89,12 +93,14 @@ class DashboardController extends Controller
             'totalProducts' => $totalProducts,
             'totalBrands' => $totalBrands,
             'totalCategories' => $totalCategories,
+            'averageRating' => number_format($averageRating, 1), // Format to 1 decimal place
+            'totalReviews' => $totalReviews,
             'salesChart' => $salesChart,
             'yearlyChart' => $yearlyChart,
             'pieChart' => $pieChart,
-            'pieLabels' => $productSales->pluck('name'), // Keep for custom legend sidebar
-            'pieData' => $productSales->pluck('total_revenue'),   // Keep for custom legend sidebar
-            'pieColors' => $pieColors,                    // Keep for custom legend sidebar
+            'pieLabels' => $productSales->pluck('name'),
+            'pieData' => $productSales->pluck('total_revenue'),
+            'pieColors' => $pieColors,
             'start' => $start,
             'end' => $end,
         ]);
