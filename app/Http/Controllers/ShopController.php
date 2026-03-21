@@ -10,30 +10,52 @@ use App\Models\OrderItem;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Models\Category;
+use App\Models\Brand;
+
 
 class ShopController extends Controller
 {
     /**
      * Display the product catalog.
      */
+
     public function index(Request $request)
     {
+        // Fetch all categories for the sidebar dropdown
+        $categories = Category::all();
+        $brands = Brand::all();
+
         $searchTerm = $request->input('search');
+        $filters = [];
 
-        // Scout handles the searching; Eloquent handles the eager loading for the view
+        // Logic for Meilisearch filters
+        if ($request->filled('category')) {
+            $filters[] = "category_name = '" . $request->category . "'";
+        }
+        
+        if ($request->filled('min_price')) {
+            $filters[] = "prices >= " . $request->min_price;
+        }
+
+        if ($request->filled('max_price')) {
+            $filters[] = "prices <= " . $request->max_price;
+        }
+        if ($request->filled('brand')) {
+            $filters[] = "brand_name = '" . $request->brand . "'";
+        }
+
         $products = Product::search($searchTerm)
-            ->query(function ($builder) {
-                $builder->with(['brand', 'category', 'shades', 'images']);
+            ->when(!empty($filters), function ($search) use ($filters) {
+                return $search->options(['filter' => implode(' AND ', $filters)]);
             })
-            ->simplePaginate(12)
-            ->withQueryString();
+            ->query(fn($query) => $query->with(['brand', 'category', 'shades', 'images']))
+            ->simplePaginate(12);
 
-        return view('shop.index', compact('products'));
+        // YOU MUST INCLUDE $categories HERE:
+        return view('shop.index', compact('products', 'categories', 'brands'));
     }
 
-    /**
-     * Display a specific product with dynamic shade selection.
-     */
     public function show(Product $product)
     {
         // Load relations including the nested review details
