@@ -20,25 +20,11 @@ class ShopController extends Controller
     {
         $searchTerm = $request->input('search');
 
-        $products = Product::query()
-            // Eager load everything to prevent N+1 issues
-            ->with(['brand', 'category', 'shades', 'images'])
-            ->when($searchTerm, function ($query, $searchTerm) {
-                $query->where(function ($q) use ($searchTerm) {
-                    // Search in Products table
-                    $q->where('name', 'like', "%{$searchTerm}%")
-                      ->orWhere('description', 'like', "%{$searchTerm}%")
-                      // Search in Brands table
-                      ->orWhereHas('brand', function ($brandQuery) use ($searchTerm) {
-                          $brandQuery->where('name', 'like', "%{$searchTerm}%");
-                      })
-                      // Search in Categories table
-                      ->orWhereHas('category', function ($catQuery) use ($searchTerm) {
-                          $catQuery->where('name', 'like', "%{$searchTerm}%");
-                      });
-                });
+        // Scout handles the searching; Eloquent handles the eager loading for the view
+        $products = Product::search($searchTerm)
+            ->query(function ($builder) {
+                $builder->with(['brand', 'category', 'shades', 'images']);
             })
-            ->latest()
             ->simplePaginate(12)
             ->withQueryString();
 
