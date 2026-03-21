@@ -40,16 +40,10 @@ class Product extends Model
 
     public function toSearchableArray(): array
     {
-        $this->load(['brand', 'category', 'shades']);
-
         return [
-            'id'            => (int) $this->id,
-            'name'          => $this->name,
-            'description'   => $this->description,
-            'finish'        => $this->finish,
-            'brand_name'    => $this->brand?->name,
-            'category_name' => $this->category?->name,
-            'prices'        => $this->shades->pluck('price')->map(fn($p) => (float)$p)->toArray(),
+            'id' => (int) $this->id,
+            'name' => $this->name,
+            'description' => $this->description,
         ];
     }
 }

@@ -26,37 +26,44 @@ class ShopController extends Controller
 
     public function index(Request $request)
     {
-        // Fetch all categories for the sidebar dropdown
         $categories = Category::all();
         $brands = Brand::all();
-
         $searchTerm = $request->input('search');
-        $filters = [];
 
-        // Logic for Meilisearch filters
-        if ($request->filled('category')) {
-            $filters[] = "category_name = '" . $request->category . "'";
-        }
-        
-        if ($request->filled('min_price')) {
-            $filters[] = "prices >= " . $request->min_price;
-        }
-
-        if ($request->filled('max_price')) {
-            $filters[] = "prices <= " . $request->max_price;
-        }
-        if ($request->filled('brand')) {
-            $filters[] = "brand_name = '" . $request->brand . "'";
-        }
-
+        // Use Scout's search, but handle filters inside the query callback
         $products = Product::search($searchTerm)
-            ->when(!empty($filters), function ($search) use ($filters) {
-                return $search->options(['filter' => implode(' AND ', $filters)]);
+            ->query(function ($query) use ($request) {
+                $query->with(['brand', 'category', 'shades', 'images']);
+
+                // Filter by Category name
+                if ($request->filled('category')) {
+                    $query->whereHas('category', function($q) use ($request) {
+                        $q->where('name', $request->category);
+                    });
+                }
+
+                // Filter by Brand name
+                if ($request->filled('brand')) {
+                    $query->whereHas('brand', function($q) use ($request) {
+                        $q->where('name', $request->brand);
+                    });
+                }
+
+                // Filter by Price (from the shades relationship)
+                if ($request->filled('min_price')) {
+                    $query->whereHas('shades', function($q) use ($request) {
+                        $q->where('price', '>=', $request->min_price);
+                    });
+                }
+
+                if ($request->filled('max_price')) {
+                    $query->whereHas('shades', function($q) use ($request) {
+                        $q->where('price', '<=', $request->max_price);
+                    });
+                }
             })
-            ->query(fn($query) => $query->with(['brand', 'category', 'shades', 'images']))
             ->simplePaginate(12);
 
-        // YOU MUST INCLUDE $categories HERE:
         return view('shop.index', compact('products', 'categories', 'brands'));
     }
 
