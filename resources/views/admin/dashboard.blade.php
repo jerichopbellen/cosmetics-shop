@@ -4,7 +4,9 @@
 <div class="container py-5 mt-4">
     <h2 class="fw-bold text-dark mb-4"><i class="fa-solid fa-chart-line me-2 text-pink"></i>Store Analytics</h2>
 
+    {{-- 1. INFORMATION CARDS --}}
     <div class="row g-3 mb-4">
+        {{-- Sales Card --}}
         <div class="col-md-4 col-lg-2">
             <a href="{{ route('admin.dashboard') }}" class="text-decoration-none h-100">
                 <div class="card border-0 shadow-sm p-3 info-card h-100">
@@ -19,6 +21,7 @@
             </a>
         </div>
 
+        {{-- Orders Card --}}
         <div class="col-md-4 col-lg-2">
             <a href="{{ route('admin.orders.index') }}" class="text-decoration-none h-100">
                 <div class="card border-0 shadow-sm p-3 info-card h-100">
@@ -33,6 +36,7 @@
             </a>
         </div>
 
+        {{-- Products Card --}}
         <div class="col-md-4 col-lg-2">
             <a href="{{ route('products.index') }}" class="text-decoration-none h-100">
                 <div class="card border-0 shadow-sm p-3 info-card h-100">
@@ -47,6 +51,7 @@
             </a>
         </div>
 
+        {{-- Brands Card --}}
         <div class="col-md-4 col-lg-2">
             <a href="{{ route('brands.index') }}" class="text-decoration-none h-100">
                 <div class="card border-0 shadow-sm p-3 info-card h-100">
@@ -61,6 +66,7 @@
             </a>
         </div>
 
+        {{-- Categories Card --}}
         <div class="col-md-4 col-lg-2">
             <a href="{{ route('categories.index') }}" class="text-decoration-none h-100">
                 <div class="card border-0 shadow-sm p-3 info-card h-100">
@@ -75,6 +81,7 @@
             </a>
         </div>
 
+        {{-- Customers Card --}}
         <div class="col-md-4 col-lg-2">
             <a href="{{ route('admin.users.index') }}" class="text-decoration-none h-100">
                 <div class="card border-0 shadow-sm p-3 info-card h-100">
@@ -90,6 +97,7 @@
         </div>
     </div>
 
+    {{-- 2. TABS NAVIGATION --}}
     <ul class="nav nav-tabs border-0 mb-4" id="analyticsTabs" role="tablist">
         <li class="nav-item">
             <button class="nav-link active" id="performance-tab" data-bs-toggle="tab" data-bs-target="#performance" type="button" role="tab">Sales Performance</button>
@@ -102,8 +110,10 @@
         </li>
     </ul>
 
+    {{-- 3. TAB CONTENT --}}
     <div class="tab-content" id="analyticsTabsContent">
-        {{-- 1. Sales Performance --}}
+        
+        {{-- Tab 1: Sales Performance (Bar) --}}
         <div class="tab-pane fade show active" id="performance" role="tabpanel">
             <div class="card border-0 shadow-sm p-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -119,29 +129,54 @@
                         @endif
                     </form>
                 </div>
-                <div style="height: 400px;"><canvas id="rangeBarChart"></canvas></div>
+                <div style="height: 400px;">
+                    {!! $salesChart->container() !!}
+                </div>
             </div>
         </div>
 
-        {{-- 2. Yearly Revenue --}}
+        {{-- Tab 2: Yearly Revenue (Line) --}}
         <div class="tab-pane fade" id="yearly" role="tabpanel">
             <div class="card border-0 shadow-sm p-4">
                 <h6 class="fw-bold text-muted text-uppercase mb-4">Historical Yearly Revenue</h6>
-                <div style="height: 400px;"><canvas id="yearlyLineChart"></canvas></div>
+                <div style="height: 400px;">
+                    {!! $yearlyChart->container() !!}
+                </div>
             </div>
         </div>
 
-        {{-- 3. Product Share --}}
+        {{-- Tab 3: Product Share (Pie) --}}
         <div class="tab-pane fade" id="share" role="tabpanel">
             <div class="card border-0 shadow-sm p-4">
                 <h6 class="fw-bold text-muted text-uppercase mb-4">Product Revenue Share</h6>
                 <div class="row align-items-center">
                     <div class="col-lg-7 border-end">
-                        <div style="height: 400px;"><canvas id="productPieChart"></canvas></div>
+                        <div style="height: 400px;">
+                            {!! $pieChart->container() !!}
+                        </div>
                     </div>
                     <div class="col-lg-5">
                         <div class="ps-lg-3">
-                            <div id="chart-legend" class="pe-2" style="max-height: 400px; overflow-y: auto; scrollbar-width: thin;"></div>
+                            <div id="chart-legend" class="pe-2" style="max-height: 400px; overflow-y: auto; scrollbar-width: thin;">
+                                @php $totalRevenue = $pieData->sum(); @endphp
+                                @foreach($pieLabels as $i => $label)
+                                    @php 
+                                        $val = $pieData[$i];
+                                        $pct = $totalRevenue > 0 ? number_format(($val / $totalRevenue) * 100, 1) : 0;
+                                    @endphp
+                                    <div class="d-flex align-items-center justify-content-between p-2 mb-1 rounded border-bottom shadow-sm-hover legend-item" 
+                                         data-index="{{ $i }}" style="cursor: pointer;">
+                                        <div class="d-flex align-items-center overflow-hidden">
+                                            <span style="width:12px; height:12px; background:{{ $pieColors[$i] }}; border-radius:3px; flex-shrink:0; margin-right:10px;"></span>
+                                            <span class="text-dark small fw-bold text-truncate">{{ $label }}</span>
+                                        </div>
+                                        <div class="text-end flex-shrink-0 ms-2">
+                                            <div class="small fw-bold text-pink">{{ $pct }}%</div>
+                                            <div class="text-muted" style="font-size: 0.7rem;">₱{{ number_format($val) }}</div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -151,123 +186,53 @@
 </div>
 
 @push('scripts')
+{{-- Load Chart.js 2.x (required by ConsoleTVs/Charts v6) --}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.min.js" charset="utf-8"></script>
+
+{{-- Render the specific Chart JS --}}
+{!! $salesChart->script() !!}
+{!! $yearlyChart->script() !!}
+{!! $pieChart->script() !!}
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const pink = '#ec4899';
-        
-        // 1. RANGE BAR CHART
-        new Chart(document.getElementById('rangeBarChart'), {
-            type: 'bar',
-            data: {
-                labels: {!! json_encode($barLabels) !!},
-                datasets: [{ 
-                    label: 'Revenue',
-                    data: {!! json_encode($barData) !!}, 
-                    backgroundColor: pink, 
-                    borderRadius: 4 
-                }]
-            },
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { legend: { display: false } } 
-            }
-        });
-
-        // 2. YEARLY LINE CHART
-        new Chart(document.getElementById('yearlyLineChart'), {
-            type: 'line',
-            data: {
-                labels: {!! json_encode($lineLabels) !!},
-                datasets: [{ 
-                    data: {!! json_encode($lineData) !!}, 
-                    borderColor: pink, 
-                    backgroundColor: 'rgba(236, 72, 153, 0.1)', 
-                    fill: true, 
-                    tension: 0.3 
-                }]
-            },
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { legend: { display: false } } 
-            }
-        });
-
-        // 3. PRODUCT PIE CHART
-        const pieData = {!! json_encode($pieData) !!};
-        const pieLabels = {!! json_encode($pieLabels) !!};
-        const totalRevenue = pieData.reduce((a, b) => a + Number(b), 0);
-        const colors = pieData.map((_, i) => `hsl(330, 75%, ${Math.max(25, 85 - (i * 3.5))}%)`);
-
-        const pieChart = new Chart(document.getElementById('productPieChart'), {
-            type: 'pie',
-            data: {
-                labels: pieLabels,
-                datasets: [{ data: pieData, backgroundColor: colors, borderWidth: 1, borderColor: '#fff' }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const val = context.parsed;
-                                const pct = ((val / totalRevenue) * 100).toFixed(2) + '%';
-                                return ` ${context.label}: ₱${val.toLocaleString()} (${pct})`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        const legendContainer = document.getElementById('chart-legend');
-        pieLabels.forEach((label, i) => {
-            const val = pieData[i];
-            const pct = ((val / totalRevenue) * 100).toFixed(1) + '%';
-            const item = document.createElement('div');
-            item.className = 'd-flex align-items-center justify-content-between p-2 mb-1 rounded border-bottom shadow-sm-hover';
-            item.style.cursor = 'pointer';
-            item.innerHTML = `
-                <div class="d-flex align-items-center overflow-hidden">
-                    <span style="width:12px; height:12px; background:${colors[i]}; border-radius:3px; flex-shrink:0; margin-right:10px;"></span>
-                    <span class="text-dark small fw-bold text-truncate">${label}</span>
-                </div>
-                <div class="text-end flex-shrink-0 ms-2">
-                    <div class="small fw-bold text-pink">${pct}</div>
-                    <div class="text-muted" style="font-size: 0.7rem;">₱${Number(val).toLocaleString()}</div>
-                </div>`;
-            item.onclick = () => {
-                const meta = pieChart.getDatasetMeta(0);
-                meta.data[i].hidden = !meta.data[i].hidden;
-                item.style.opacity = meta.data[i].hidden ? '0.3' : '1';
-                pieChart.update();
-            };
-            legendContainer.appendChild(item);
+        // Handle custom legend interaction for Pie Chart
+        const legendItems = document.querySelectorAll('.legend-item');
+        legendItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const index = this.getAttribute('data-index');
+                const chartName = "{{ $pieChart->id }}";
+                const chartInstance = window[chartName];
+                
+                const meta = chartInstance.getDatasetMeta(0);
+                meta.data[index].hidden = !meta.data[index].hidden;
+                this.style.opacity = meta.data[index].hidden ? '0.3' : '1';
+                chartInstance.update();
+            });
         });
     });
 </script>
 
 <style>
+    .btn-pink { background-color: #ec4899; color: white; border: none; }
+    .btn-pink:hover { background-color: #db2777; color: white; }
+    .border-pink { border-color: #fce7f3 !important; }
     .info-card:hover { transform: translateY(-5px); }
     .icon-box { width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 1.25rem; }
     .bg-soft-pink { background: #fce7f3; color: #ec4899; }
     .bg-soft-blue { background: #e0f2fe; color: #0ea5e9; }
     .bg-soft-green { background: #dcfce7; color: #22c55e; }
     .bg-soft-orange { background: #ffedd5; color: #f97316; }
-    #chart-legend::-webkit-scrollbar { width: 5px; }
-    #chart-legend::-webkit-scrollbar-thumb { background: #ec4899; border-radius: 10px; }
     .bg-soft-purple { background: #f3e8ff; color: #a855f7; }
     .bg-soft-teal { background: #f0fdfa; color: #14b8a6; }
     .info-card { transition: all 0.3s cubic-bezier(.25,.8,.25,1); border: 1px solid transparent !important;}
     a:hover .info-card { 
         background-color: #fff !important;
-        border-color: #ec4899 !important; /* Pink border on hover */
+        border-color: #ec4899 !important;
         box-shadow: 0 10px 15px -3px rgba(236, 72, 153, 0.1) !important;
     }
+    #chart-legend::-webkit-scrollbar { width: 5px; }
+    #chart-legend::-webkit-scrollbar-thumb { background: #ec4899; border-radius: 10px; }
 </style>
 @endpush
 @endsection

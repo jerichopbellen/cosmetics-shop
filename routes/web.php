@@ -11,6 +11,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\ReviewController as ShopReviewController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Verified;
@@ -74,7 +75,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 Route::middleware(['auth', 'verified', 'admin'])
     ->prefix('admin')
     ->group(function () {
-        Route::get('/dashboard', [OrderController::class, 'dashboard'])->name('admin.dashboard');
+        Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');        
         Route::resource('brands', BrandController::class);
         Route::resource('categories', CategoryController::class);
         Route::resource('products', ProductController::class);
