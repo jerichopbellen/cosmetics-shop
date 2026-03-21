@@ -38,6 +38,9 @@ class ReviewDataTable extends DataTable
                     </a>
                 </div>';
             })
+            ->editColumn('created_at', function($row) {
+                return $row->created_at->format('M d, Y h:i A');
+             })
             ->setRowId('id')
             ->rawColumns(['product_name', 'rating', 'action']);
     }

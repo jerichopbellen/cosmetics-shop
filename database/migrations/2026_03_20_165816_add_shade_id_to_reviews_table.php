@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::table('reviews', function (Blueprint $table) {
             // Adding shade_id as a foreign key
-            $table->foreignId('shade_id')->after('product_id')->constrained('shades')->onDelete('cascade');
+            $table->foreignId('shade_id')->after('product_id')->constrained('shades')->cascadeOnDelete();
         });
     }
 
