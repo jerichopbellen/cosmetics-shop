@@ -30,7 +30,6 @@
                 <div class="mt-5 border-top pt-4">
                     <p class="small text-muted">
                         A confirmation email has been sent to your inbox. <br>
-                        Need help? <a href="#" class="text-pink">Contact Support</a>
                     </p>
                 </div>
             </div>

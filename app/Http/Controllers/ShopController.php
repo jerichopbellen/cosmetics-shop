@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Models\Category;
 use App\Models\Brand;
+use App\Mail\OrderPlaced;
+use Illuminate\Support\Facades\Mail;
+use App\Http\Controllers\Exception;
+use Illuminate\Support\Facades\Log;
 
 
 class ShopController extends Controller
@@ -183,7 +187,15 @@ class ShopController extends Controller
             DB::commit();
             session()->forget('cart');
 
-            // Redirect to a success page (we will build this next)
+            $order->load('user', 'orderItems.shade.product');
+
+            try {
+                Mail::to($request->user()->email)->send(new OrderPlaced($order));
+            } catch (\Exception $e) {
+ 
+                Log::error("Mail failed: " . $e->getMessage());
+            }
+
             return redirect()->route('checkout.success', $order->order_number);
 
         } catch (\Exception $e) {
