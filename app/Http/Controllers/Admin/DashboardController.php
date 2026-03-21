@@ -12,7 +12,7 @@ use App\Models\User;
 use App\Models\Product;
 use App\Models\Brand;
 use App\Models\Category;
-use App\Models\Review; // Added Review Model
+use App\Models\Review;
 
 // Charts
 use App\Charts\SalesPerformanceChart;
@@ -28,7 +28,13 @@ class DashboardController extends Controller
         $pink = '#ec4899';
 
         // --- 1. Information Card Data ---
-        $totalSales = Order::where('status', '=', 'Delivered')->sum('total_amount');
+        // We JOIN order_items because the total_amount column is gone.
+        $totalSales = DB::table('order_items')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->where('orders.status', '=', 'Delivered')
+            ->selectRaw('SUM(order_items.price * order_items.quantity) as total')
+            ->value('total') ?? 0;
+
         $totalOrders = Order::count();
         $totalCustomers = User::where('role', 'customer')->count();
         $totalProducts = Product::count();
@@ -38,8 +44,11 @@ class DashboardController extends Controller
         $totalReviews = Review::count();
 
         // --- 2. Yearly Sales (Line Chart) ---
-        $yearlySalesData = Order::where('status', '=', 'Delivered')
-            ->selectRaw('YEAR(created_at) as year, SUM(total_amount) as total')
+        // Summing (price * quantity) from order_items grouped by Year
+        $yearlySalesData = DB::table('order_items')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->where('orders.status', '=', 'Delivered')
+            ->selectRaw('YEAR(orders.created_at) as year, SUM(order_items.price * order_items.quantity) as total')
             ->groupBy('year')
             ->orderBy('year', 'asc')
             ->get();
@@ -51,11 +60,13 @@ class DashboardController extends Controller
             ->backgroundColor('rgba(236, 72, 153, 0.1)');
 
         // --- 3. Range Sales (Bar Chart) ---
-        $barQuery = Order::where('status', '=', 'Delivered')
-            ->selectRaw('DATE(created_at) as date, SUM(total_amount) as total');
+        $barQuery = DB::table('order_items')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->where('orders.status', '=', 'Delivered')
+            ->selectRaw('DATE(orders.created_at) as date, SUM(order_items.price * order_items.quantity) as total');
         
         if ($start && $end) {
-            $barQuery->whereBetween('created_at', ["{$start} 00:00:00", "{$end} 23:59:59"]);
+            $barQuery->whereBetween('orders.created_at', ["{$start} 00:00:00", "{$end} 23:59:59"]);
         }
         
         $rangeSales = $barQuery->groupBy('date')->orderBy('date')->get();
@@ -66,6 +77,7 @@ class DashboardController extends Controller
             ->backgroundColor($pink);
 
         // --- 4. Product Pie Chart (Revenue Share) ---
+        // Note: I kept your join logic for shades -> products
         $productSales = DB::table('order_items')
             ->join('shades', 'order_items.shade_id', '=', 'shades.id')
             ->join('products', 'shades.product_id', '=', 'products.id')
@@ -93,7 +105,7 @@ class DashboardController extends Controller
             'totalProducts' => $totalProducts,
             'totalBrands' => $totalBrands,
             'totalCategories' => $totalCategories,
-            'averageRating' => number_format($averageRating, 1), // Format to 1 decimal place
+            'averageRating' => number_format($averageRating, 1),
             'totalReviews' => $totalReviews,
             'salesChart' => $salesChart,
             'yearlyChart' => $yearlyChart,

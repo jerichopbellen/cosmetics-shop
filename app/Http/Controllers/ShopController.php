@@ -139,7 +139,7 @@ class ShopController extends Controller
 
     public function processCheckout(Request $request)
     {
-        // 1. Validate the shipping data from your new blade
+        // 1. Validate the shipping data
         $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'required|string',
@@ -154,11 +154,12 @@ class ShopController extends Controller
         DB::beginTransaction();
 
         try {
-            // 2. Create the Order with shipping details
+            // 2. Create the Order WITHOUT 'total_amount'
+            // Since the column is dropped, we let the Accessor handle the math later.
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'order_number' => 'GLOW-' . strtoupper(Str::random(10)),
-                'total_amount' => collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']),
+                // REMOVED 'total_amount' line from here
                 'status' => 'Pending',
                 'address' => $request->address,
                 'phone' => $request->phone,
@@ -178,7 +179,7 @@ class ShopController extends Controller
                     'order_id' => $order->id,
                     'shade_id' => $item['shade_id'],
                     'quantity' => $item['quantity'],
-                    'price'    => $item['price'],
+                    'price'    => $item['price'], // Snapshotting price here is crucial for 3NF!
                 ]);
 
                 $shade->decrement('stock', $item['quantity']);
@@ -192,7 +193,6 @@ class ShopController extends Controller
             try {
                 Mail::to($request->user()->email)->send(new OrderPlaced($order));
             } catch (\Exception $e) {
- 
                 Log::error("Mail failed: " . $e->getMessage());
             }
 
@@ -203,7 +203,6 @@ class ShopController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
-
     public function success($order_number)
     {
         return view('shop.success', compact('order_number'));

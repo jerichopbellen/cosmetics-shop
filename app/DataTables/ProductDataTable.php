@@ -31,7 +31,7 @@ class ProductDataTable extends DataTable
                 $min = $row->shades->min('price');
                 $max = $row->shades->max('price');
                 if (!$min) return 'N/A';
-                return $min == $max ? '$' . number_format($min, 2) : '$' . number_format($min, 2) . ' - $' . number_format($max, 2);
+                return $min == $max ? '₱' . number_format($min, 2) : '₱' . number_format($min, 2) . ' - ₱' . number_format($max, 2);
             })
             ->addColumn('action', function($row) {
                 return '
