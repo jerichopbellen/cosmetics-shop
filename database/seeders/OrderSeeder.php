@@ -22,17 +22,16 @@ class OrderSeeder extends Seeder
         for ($i = 1; $i <= 25; $i++) {
             $randomDate = Carbon::now()->subDays(rand(0, 1160));
             
+            // FIX: Removed 'total_amount' from the insert array
             $orderId = DB::table('orders')->insertGetId([
                 'user_id'        => $customerIds[array_rand($customerIds)],
                 'order_number'   => 'GLOW-' . strtoupper(Str::random(10)),
-                'total_amount'   => 0, 
                 'status'         => ['Delivered', 'Pending', 'Cancelled'][rand(0, 2)],
                 'payment_method' => 'COD',
                 'created_at'     => $randomDate,
                 'updated_at'     => $randomDate,
             ]);
 
-            $orderTotal = 0;
             $numberOfItems = rand(1, 4);
 
             for ($j = 0; $j < $numberOfItems; $j++) {
@@ -43,17 +42,11 @@ class OrderSeeder extends Seeder
                     'order_id'   => $orderId,
                     'shade_id'   => $shade->id,
                     'quantity'   => $quantity,
-                    'price'      => $shade->price,
+                    'price'      => $shade->price, 
                     'created_at' => $randomDate,
                     'updated_at' => $randomDate,
                 ]);
-
-                $orderTotal += ($shade->price * $quantity);
             }
-
-            // Update the final total for the order
-            DB::table('orders')->where('id', $orderId)->update(['total_amount' => $orderTotal]);
         }
-        
     }
 }
