@@ -73,12 +73,20 @@ public function store(Request $request)
 
     public function destroy(Brand $brand)
     {
-        $brand->delete();
-        
         try {
-            return redirect()->route('brands.index')->with('success', 'Brand deleted successfully!');
+            if ($brand->products()->exists()) {
+                return redirect()->route('brands.index')
+                    ->with('error', 'Unsuccessful deletion: Cannot delete "' . $brand->name . '" because it is still associated with existing products.');
+            }
+
+            $brand->delete();
+
+            return redirect()->route('brands.index')
+                ->with('success', 'Brand deleted successfully!');
+
         } catch (\Exception $e) {
-            return back()->with('error', 'Something went wrong while deleting.');
+            return redirect()->route('brands.index')
+                ->with('error', 'Something went wrong while deleting: ' . $e->getMessage());
         }
-    }   
+    }  
 }

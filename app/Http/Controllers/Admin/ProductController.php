@@ -81,9 +81,25 @@ class ProductController extends Controller
         return view('admin.products.edit', compact('product', 'brands', 'categories'));
     }
 
-    public function destroy(Product $product) {
-        $product->delete();
-        return redirect()->route('products.index')->with('success', 'Deleted!');
+    public function destroy(Product $product)
+    {
+        try {
+            $hasOrders = \App\Models\OrderItem::whereIn('shade_id', $product->shades->pluck('id'))->exists();
+
+            if ($hasOrders) {
+                return redirect()->route('products.index')
+                    ->with('error', 'Cannot delete: This product has already been ordered by customers.');
+            }
+
+            $product->delete();
+
+            return redirect()->route('products.index')
+                ->with('success', 'Product deleted successfully!');
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            return redirect()->route('products.index')
+                ->with('error', 'Unsuccessful deletion:' . $e->getMessage());
+        }
     }
 
     public function update(Request $request, Product $product)

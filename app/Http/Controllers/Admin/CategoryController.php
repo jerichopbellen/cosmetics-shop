@@ -55,10 +55,19 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         try {
+            if ($category->products()->exists()) {
+                return redirect()->route('categories.index')
+                    ->with('error', 'Unsuccessful deletion: Cannot delete the category "' . $category->name . '" because it still contains products.');
+            }
+
             $category->delete();
-            return redirect()->route('categories.index')->with('success', 'Category deleted successfully!');
+
+            return redirect()->route('categories.index')
+                ->with('success', 'Category deleted successfully!');
+
         } catch (\Exception $e) {
-            return back()->with('error', 'Something went wrong while deleting.');
+            return redirect()->route('categories.index')
+                ->with('error', 'Something went wrong: ' . $e->getMessage());
         }
     }
 }
