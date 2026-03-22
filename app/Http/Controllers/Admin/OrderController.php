@@ -7,10 +7,6 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 use App\DataTables\OrderDataTable;
 use Illuminate\Support\Facades\DB;
-use App\Models\User;
-use App\Models\Product;
-use App\Models\Brand;
-use App\Models\Category;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\Exception;
 use Illuminate\Support\Facades\Log;
@@ -44,16 +40,43 @@ class OrderController extends Controller
             'tracking_id' => 'nullable|string|max:255',
         ]);
 
-        $order->update([
-            'status' => $request->status,
-            'tracking_id' => $request->tracking_id,
-        ]);
+        $oldStatus = $order->status;
+        $newStatus = $request->status;
 
+        DB::beginTransaction();
+        try {
+            if ($newStatus === 'Cancelled' && $oldStatus !== 'Cancelled') {
+                foreach ($order->orderItems as $item) {
+                    $item->shade()->increment('stock', $item->quantity);
+                }
+            }
+            
+            if ($oldStatus === 'Cancelled' && $newStatus !== 'Cancelled') {
+                foreach ($order->orderItems as $item) {
+                    if ($item->shade->stock < $item->quantity) {
+                        throw new \Exception("Cannot restore order. Insufficient stock for " . $item->shade->shade_name);
+                    }
+                    $item->shade()->decrement('stock', $item->quantity);
+                }
+            }
+
+            $order->update([
+                'status' => $newStatus,
+                'tracking_id' => $request->tracking_id,
+            ]);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+
+        
         try {
             Mail::to($order->user->email)->send(new OrderStatusUpdated($order));
         } catch (\Exception $e) {
             Log::error("Status Update Email Failed: " . $e->getMessage());
-        }
+        } 
 
         return redirect()->back()->with('success', 'Order status updated successfully!');
     }

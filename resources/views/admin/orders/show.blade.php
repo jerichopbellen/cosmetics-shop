@@ -97,14 +97,37 @@
                         <div class="mb-4">
                             <label class="form-label small text-uppercase fw-bold text-muted">Order Status</label>
                             <select name="status" class="form-select border-pink shadow-none py-2">
-                                @foreach(['Pending', 'Packing', 'Shipped', 'Delivered', 'Cancelled'] as $status)
+                                @php
+                                    $statuses = ['Pending', 'Packing', 'Shipped', 'Delivered', 'Cancelled'];
+                                    $currentIndex = array_search($order->status, $statuses);
+                                @endphp
+
+                                @foreach($statuses as $index => $status)
                                     @php
-                                        $disabled = false;
-                                        if ($order->status == 'Packing' && $status == 'Pending') $disabled = true;
-                                        if ($order->status == 'Shipped' && in_array($status, ['Pending', 'Packing', 'Cancelled'])) $disabled = true;
-                                        if ($order->status == 'Delivered' && $status != 'Delivered') $disabled = true;
+                                        $disabled = true;
+
+                                        if ($order->status == 'Delivered') {
+                                            $disabled = ($status != 'Delivered');
+                                        } 
+                                        
+                                        elseif ($order->status == 'Cancelled') {
+                                            $disabled = false;
+                                        }
+
+                                        else {
+                                            if ($status == $order->status || $index === $currentIndex + 1) {
+                                                $disabled = false;
+                                            }
+                                            
+                                            if ($status == 'Cancelled') {
+                                                $disabled = false;
+                                            }
+                                        }
                                     @endphp
-                                    <option value="{{ $status }}" {{ $order->status == $status ? 'selected' : '' }} {{ $disabled ? 'disabled' : '' }}>
+
+                                    <option value="{{ $status }}" 
+                                        {{ $order->status == $status ? 'selected' : '' }} 
+                                        {{ $disabled ? 'disabled' : '' }}>
                                         {{ $status }}
                                     </option>
                                 @endforeach
