@@ -7,6 +7,7 @@ use App\Models\User;
 use App\DataTables\UserDataTable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 
 class UserController extends Controller
@@ -19,7 +20,34 @@ class UserController extends Controller
     public function show(User $user)
     {
         $user->load(['orders.orderItems.shade.product']);
-        return view('admin.users.show', compact('user'));
+
+        $userTotal = $user->orders()->where('status', 'Delivered')
+            ->with('orderItems')
+            ->get()
+            ->sum(fn($order) => $order->orderItems->sum(fn($item) => $item->price * $item->quantity));
+
+        $allTotals = User::withSum(['orderItems as total_spent' => function($query) {
+                $query->whereHas('order', function($q) {
+                    $q->where('status', 'Delivered');
+                })->select(DB::raw('SUM(price * quantity)'));
+            }], 'price')
+            ->pluck('total_spent')
+            ->map(fn($val) => $val ?? 0)
+            ->sortDesc()
+            ->values();
+
+        $totalUsers = $allTotals->count();
+        
+        if ($userTotal > 0 && $totalUsers > 0) {
+            $rank = $allTotals->search(fn($val) => $val <= $userTotal) + 1;
+            $percentile = ($rank / $totalUsers) * 100;
+            
+            $userRank = 'Top ' . ceil($percentile) . '%';
+        } else {
+            $userRank = 'No Rank';
+        }
+
+        return view('admin.users.show', compact('user', 'userRank', 'userTotal'));
     }
 
     public function updateRole(Request $request, User $user)

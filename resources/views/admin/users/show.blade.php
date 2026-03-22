@@ -14,11 +14,10 @@
         <div class="card-body p-4">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
                 <div class="d-flex align-items-center">
-                    {{-- Profile Image / Initial Logic --}}
                     @if($user->image_path)
                         <img src="{{ asset('storage/' . $user->image_path) }}" alt="{{ $user->name }}" class="rounded-circle shadow-sm me-3" style="width: 60px; height: 60px; object-fit: cover;">
                     @else
-                        <div class="bg-pink text-white d-flex align-items-center justify-content-center fw-bold rounded-circle shadow-sm me-3" 
+                        <div class="text-white d-flex align-items-center justify-content-center fw-bold rounded-circle shadow-sm me-3" 
                              style="width: 60px; height: 60px; font-size: 1.5rem; background-color: #ec4899;">
                             {{ strtoupper(substr($user->name, 0, 1)) }}
                         </div>
@@ -28,26 +27,22 @@
                         <p class="text-muted mb-0 small">
                             <i class="fa-regular fa-envelope me-1"></i> {{ $user->email }} 
                             <span class="mx-2 opacity-25">|</span>
-                            <span class="text-pink" style="color: #ec4899;">Joined {{ $user->created_at->format('M d, Y') }}</span>
+                            <span style="color: #ec4899;">Joined {{ $user->created_at->format('M d, Y') }}</span>
                         </p>
                     </div>
                 </div>
 
-                <div class="mt-3 mt-md-0 d-flex gap-2">
-                    {{-- Readable Soft Verification Badges --}}
+                <div class="mt-3 mt-md-0 d-flex gap-2 align-items-center">
                     @if($user->email_verified_at)
-                        {{-- Darker Blue text (#004085) for high readability --}}
                         <span class="badge bg-info-subtle border border-info px-3 py-2 rounded-pill shadow-sm" style="font-size: 0.75rem; color: #004085;">
                             <i class="fa-solid fa-envelope-circle-check me-1"></i> VERIFIED
                         </span>
                     @else
-                        {{-- Darker Golden text (#856404) for high readability --}}
                         <span class="badge bg-warning-subtle border border-warning px-3 py-2 rounded-pill shadow-sm" style="font-size: 0.75rem; color: #856404;">
-                            <i class="fa-solid fa-hourglass-half me-1"></i> PENDING VERIFICATION
+                            <i class="fa-solid fa-hourglass-half me-1"></i> PENDING
                         </span>
                     @endif
 
-                    {{-- Original Status Badge (Green) --}}
                     @if($user->is_active)
                         <span class="badge bg-success-subtle text-success border border-success px-3 py-2 rounded-pill shadow-sm" style="font-size: 0.75rem;">
                             <i class="fa-solid fa-check-circle me-1"></i> ACTIVE
@@ -58,7 +53,6 @@
                         </span>
                     @endif
 
-                    {{-- Original Role Badge (Pink) --}}
                     <span class="badge {{ $user->role === 'admin' ? 'bg-pink text-white' : 'bg-light text-dark border' }} px-3 py-2 text-uppercase rounded-pill shadow-sm" 
                           style="font-size: 0.75rem; {{ $user->role === 'admin' ? 'background-color: #ec4899 !important;' : '' }}">
                         {{ strtoupper($user->role) }}
@@ -69,10 +63,9 @@
     </div>
 
     <div class="row g-4">
-        {{-- Left: Order History & Activity --}}
+        {{-- Left: Order History --}}
         <div class="col-lg-8">
-            {{-- Order History Card --}}
-            <div class="card border-0 shadow-sm overflow-hidden mb-4 h-100">
+            <div class="card border-0 shadow-sm overflow-hidden mb-4">
                 <div style="height: 4px; background-color: #ec4899;"></div>
                 <div class="card-header bg-white py-3">
                     <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-history me-2" style="color: #ec4899;"></i>Order History</h5>
@@ -89,7 +82,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($user->orders as $order)
+                                @forelse($user->orders->sortByDesc('created_at') as $order)
                                     <tr>
                                         <td class="ps-4">
                                             <a href="{{ route('admin.orders.show', $order->id) }}" class="fw-bold text-decoration-none" style="color: #ec4899;">
@@ -109,13 +102,13 @@
                                                     default => 'bg-pink text-white'
                                                 };
                                             @endphp
-                                            <span class="badge {{ $statusClass }} rounded-pill px-3" 
-                                                  style="font-size: 0.7rem; {{ $order->status === 'Pending' ? '' : ($order->status === 'Delivered' ? '' : 'background-color: #ec4899 !important;') }}">
+                                            <span class="badge {{ $statusClass }} rounded-pill px-3" style="font-size: 0.7rem;">
                                                 {{ strtoupper($order->status) }}
                                             </span>
                                         </td>
                                         <td class="text-end pe-4 fw-bold text-dark">
-                                            ₱{{ number_format($order->total_amount, 2) }}
+                                            {{-- Calculation from OrderItems since column was dropped --}}
+                                            ₱{{ number_format($order->orderItems->sum(fn($i) => $i->price * $i->quantity), 2) }}
                                         </td>
                                     </tr>
                                 @empty
@@ -133,13 +126,24 @@
             </div>
         </div>
 
-        {{-- Right: Controls --}}
+        {{-- Right: Metrics & Controls --}}
         <div class="col-lg-4">
-            {{-- Metrics --}}
+            {{-- Metrics with Percentile Ranking --}}
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body p-4 text-center">
                     <p class="text-muted small text-uppercase mb-1 tracking-wider">Lifetime Spend</p>
-                    <h3 class="fw-bold mb-0" style="color: #ec4899;">₱{{ number_format($user->orders->where('status', 'Delivered')->sum('total_amount'), 2) }}</h3>
+                    <h3 class="fw-bold mb-2" style="color: #ec4899;">₱{{ number_format($userTotal, 2) }}</h3>
+                    
+                    @if($userRank !== 'No Rank')
+                        <span class="badge rounded-pill px-3 py-2 shadow-sm" 
+                              style="background-color: #fce7f3; color: #ec4899; font-size: 0.8rem; border: 1px solid #f9a8d4;">
+                            <i class="fa-solid fa-trophy me-1"></i> {{ $userRank }} of Customers
+                        </span>
+                    @else
+                        <span class="badge bg-light text-muted border px-3 py-2 rounded-pill" style="font-size: 0.8rem;">
+                            No Ranking Available
+                        </span>
+                    @endif
                 </div>
             </div>
 
