@@ -1,7 +1,7 @@
 @extends('layouts.base')
 
 @section('body')
-<div class="container py-5">
+<div class="container py-5 mt-4">
     <div class="mb-4">
         <a href="{{ route('admin.orders.index') }}" class="text-decoration-none text-muted small">
             <i class="fa-solid fa-arrow-left me-1"></i> Back to Orders
@@ -37,11 +37,22 @@
                                 <tr>
                                     <td class="ps-4 py-3">
                                         <div class="d-flex align-items-center">
-                                            <img src="{{ asset('storage/' . ($item->shade->image_path ?? 'placeholder.jpg')) }}" 
+                                            {{-- Use placeholder if shade or image is missing due to deletion --}}
+                                            @php
+                                                $imagePath = ($item->shade && $item->shade->image_path) 
+                                                    ? asset('storage/' . $item->shade->image_path) 
+                                                    : asset('images/placeholder.jpg');
+                                            @endphp
+                                            <img src="{{ $imagePath }}" 
                                                  class="rounded border-pink me-3" style="width: 60px; height: 60px; object-fit: cover;">
                                             <div>
-                                                <div class="fw-bold text-dark">{{ $item->shade->product->name }}</div>
-                                                <span class="badge bg-light text-pink border border-pink small">{{ $item->shade->shade_name }}</span>
+                                                {{-- Check if shade and product exist (not soft-deleted) --}}
+                                                <div class="fw-bold text-dark">
+                                                    {{ $item->shade && $item->shade->product ? $item->shade->product->name : 'N/A' }}
+                                                </div>
+                                                <span class="badge bg-light text-pink border border-pink small">
+                                                    {{ $item->shade ? $item->shade->shade_name : 'N/A' }}
+                                                </span>
                                             </div>
                                         </div>
                                     </td>
@@ -64,6 +75,7 @@
         </div>
 
         <div class="col-lg-4">
+            {{-- Customer Info Card --}}
             <div class="card border-0 shadow-sm mb-4 overflow-hidden">
                 <div style="height: 4px; background-color: #ec4899;"></div>
                 <div class="card-header bg-white py-3">
@@ -84,6 +96,7 @@
                 </div>
             </div>
 
+            {{-- Fulfillment Update Card --}}
             <div class="card border-0 shadow-sm overflow-hidden">
                 <div style="height: 4px; background-color: #ec4899;"></div>
                 <div class="card-header bg-white py-3">
@@ -109,17 +122,12 @@
                                         if ($order->status == 'Delivered') {
                                             $disabled = ($status != 'Delivered');
                                         } 
-                                        
                                         elseif ($order->status == 'Cancelled') {
-                                            $disabled = false;
+                                            $disabled = ($status != 'Cancelled');
                                         }
-
                                         else {
-                                            if ($status == $order->status || $index === $currentIndex + 1) {
-                                                $disabled = false;
-                                            }
-                                            
-                                            if ($status == 'Cancelled') {
+                                            // Allow current status, the next step in workflow, or cancellation
+                                            if ($status == $order->status || $index === $currentIndex + 1 || $status == 'Cancelled') {
                                                 $disabled = false;
                                             }
                                         }
@@ -143,5 +151,4 @@
         </div>
     </div>
 </div>
-
 @endsection

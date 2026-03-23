@@ -76,7 +76,7 @@ class UserDataTable extends DataTable
             Column::make('role')->title('Role')->addClass('text-center'),
             Column::make('is_active')->title('Status')->addClass('text-center'),
             Column::make('total_orders')->title('Orders')->addClass('text-center'),
-            Column::make('lifetime_spent')->title('Lifetime Spent')->addClass('text-end'),
+            Column::make('lifetime_spent')->title('Lifetime Spent')->addClass('text-end')->searchable(false),
             Column::make('created_at')->title('Joined'),
             Column::computed('action')
                   ->exportable(false)

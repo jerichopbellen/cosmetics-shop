@@ -69,13 +69,17 @@
                                     @foreach($order->orderItems as $item)
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <div class="d-flex align-items-center">
-                                                <img src="{{ asset('storage/' . ($item->shade->image_path ?? 'placeholders/product.png')) }}" 
+                                                @php
+                                                    $activeShade = $item->shade;
+                                                    $activeProduct = $activeShade ? $activeShade->product : null;
+                                                @endphp
+                                                <img src="{{ $activeShade && $activeShade->image_path ? asset('storage/' . $activeShade->image_path) : asset('placeholders/product.png') }}" 
                                                      class="rounded border border-pink p-1 me-3" 
                                                      style="width: 50px; height: 50px; object-fit: cover;">
                                                 <div>
-                                                    <div class="fw-bold text-dark">{{ $item->shade->product->name }}</div>
+                                                    <div class="fw-bold text-dark">{{ $activeProduct->name ?? 'N/A' }}</div>
                                                     <div class="small">
-                                                        <span class="text-pink fw-semibold">{{ $item->shade->shade_name }}</span> 
+                                                        <span class="text-pink fw-semibold">{{ $activeShade->shade_name ?? 'N/A' }}</span> 
                                                         <span class="text-muted">| Qty: {{ $item->quantity }}</span>
                                                     </div>
                                                 </div>
@@ -164,34 +168,36 @@
                                     @foreach($history->orderItems as $item)
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <div class="d-flex align-items-center">
-                                                <img src="{{ asset('storage/' . ($item->shade->image_path ?? 'placeholders/product.png')) }}" 
+                                                @php
+                                                    $histShade = $item->shade;
+                                                    $histProduct = $histShade ? $histShade->product : null;
+                                                @endphp
+                                                <img src="{{ $histShade && $histShade->image_path ? asset('storage/' . $histShade->image_path) : asset('placeholders/product.png') }}" 
                                                      class="rounded border border-pink p-1 me-3" 
                                                      style="width: 50px; height: 50px; object-fit: cover;">
                                                 <div>
-                                                    <div class="fw-bold text-dark">{{ $item->shade->product->name }}</div>
+                                                    <div class="fw-bold text-dark">{{ $histProduct->name ?? 'N/A' }}</div>
                                                     <div class="small">
-                                                        <span class="text-pink fw-semibold">{{ $item->shade->shade_name }}</span> 
+                                                        <span class="text-pink fw-semibold">{{ $histShade->shade_name ?? 'N/A' }}</span> 
                                                         <span class="text-muted">| Qty: {{ $item->quantity }}</span>
                                                     </div>
                                                     
-                                                    @if($history->status === 'Delivered')
+                                                    {{-- Only allow reviews if the product and shade still exist --}}
+                                                    @if($history->status === 'Delivered' && $histShade && $histProduct)
                                                         <div class="mt-2">
                                                             @php
-                                                                // Check if this specific shade/product combo was already reviewed by the user
                                                                 $existingReview = \App\Models\Review::where('user_id', auth()->id())
-                                                                    ->where('product_id', $item->shade->product_id)
-                                                                    ->where('shade_id', $item->shade_id)
+                                                                    ->where('product_id', $histProduct->id)
+                                                                    ->where('shade_id', $histShade->id)
                                                                     ->first();
                                                             @endphp
 
                                                             @if($existingReview)
-                                                                {{-- Edit Button --}}
                                                                 <a href="{{ route('reviews.edit', $existingReview->id) }}" class="text-primary text-decoration-none small fw-bold">
                                                                     <i class="fa-solid fa-pen-to-square me-1"></i> Edit Review
                                                                 </a>
                                                             @else
-                                                                {{-- Create Button --}}
-                                                                <a href="{{ route('reviews.create', ['product' => $item->shade->product_id, 'shade' => $item->shade_id]) }}" class="text-pink text-decoration-none small fw-bold">
+                                                                <a href="{{ route('reviews.create', ['product' => $histProduct->id, 'shade' => $histShade->id]) }}" class="text-pink text-decoration-none small fw-bold">
                                                                     <i class="fa-solid fa-star me-1"></i> Write a Review
                                                                 </a>
                                                             @endif
