@@ -12,11 +12,6 @@ use Yajra\DataTables\Services\DataTable;
 
 class ProductDataTable extends DataTable
 {
-    /**
-     * Build the DataTable class.
-     *
-     * @param QueryBuilder $query Results from query() method.
-     */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
@@ -26,42 +21,59 @@ class ProductDataTable extends DataTable
             ->addColumn('category', function($row) {
                 return $row->category ? $row->category->name : 'N/A';
             })
-            // Display price range from shades
             ->addColumn('price_range', function($row) {
                 $min = $row->shades->min('price');
                 $max = $row->shades->max('price');
                 if (!$min) return 'N/A';
                 return $min == $max ? '₱' . number_format($min, 2) : '₱' . number_format($min, 2) . ' - ₱' . number_format($max, 2);
             })
+            ->addColumn('status', function($row) {
+                if ($row->trashed()) {
+                    return '<span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 rounded-pill">Archived</span>';
+                }
+                return '<span class="badge bg-success-subtle text-success border border-success-subtle px-3 rounded-pill">Active</span>';
+            })
             ->addColumn('action', function($row) {
+                if ($row->trashed()) {
+                    return '
+                    <div class="d-flex justify-content-center">
+                        <form action="'.route('products.restore', $row->id).'" method="POST">
+                            '.csrf_field().'
+                            <button type="submit" class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-trash-restore me-1"></i> Restore
+                            </button>
+                        </form>
+                    </div>';
+                }
+
                 return '
                 <div class="d-flex justify-content-center gap-2">
                     <a href="'.route('products.edit', $row->id).'" class="btn btn-sm btn-outline-secondary" title="Edit">
                         <i class="fas fa-edit"></i>
                     </a>
-                    <form action="'.route('products.destroy', $row->id).'" method="POST" onsubmit="return confirm(\'Delete this product?\')">
+                    <form action="'.route('products.destroy', $row->id).'" method="POST" onsubmit="return confirm(\'Archive this product? It will be hidden from the shop.\')">
                         '.csrf_field().method_field('DELETE').'
-                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
-                            <i class="fas fa-trash"></i>
+                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Archive">
+                            <i class="fas fa-archive"></i>
                         </button>
                     </form>
                 </div>';
             })     
             ->setRowId('id')
-            ->rawColumns(['action']);
+            ->rawColumns(['action', 'status']);
     }
 
-    /**
-     * Get the query source of dataTable.
-     */
-    public function query(Product $model): QueryBuilder
+   public function query(Product $model): QueryBuilder
     {
-        return $model->newQuery()->with(['brand', 'category', 'shades']);
-    }
+        $query = $model->newQuery()->with(['brand', 'category', 'shades']);
+        
+        if ($this->only_trashed) {
+            return $query->onlyTrashed();
+        }
 
-    /**
-     * Optional method if you want to use the html builder.
-     */
+        return $query; 
+}
+
     public function html(): HtmlBuilder
     {
         return $this->builder()
@@ -79,18 +91,15 @@ class ProductDataTable extends DataTable
                     ]);
     }
 
-    /**
-     * Get the dataTable columns definition.
-     */
     public function getColumns(): array
     {
         return [
             Column::make('id'),
             Column::make('name')->title('Product Name'),
-            // Finish column removed from here
             Column::computed('brand')->title('Brand'),
             Column::computed('category')->title('Category'),
             Column::computed('price_range')->title('Price Range'),
+            Column::computed('status')->title('Status')->addClass('text-center'),
             Column::computed('action')
                   ->exportable(false)
                   ->printable(false)
@@ -99,9 +108,6 @@ class ProductDataTable extends DataTable
         ];
     }
 
-    /**
-     * Get the filename for export.
-     */
     protected function filename(): string
     {
         return 'Product_' . date('YmdHis');

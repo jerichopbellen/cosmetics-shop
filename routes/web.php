@@ -78,7 +78,6 @@ Route::middleware(['auth', 'verified', 'admin'])
         Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');        
         Route::resource('brands', BrandController::class);
         Route::resource('categories', CategoryController::class);
-        Route::resource('products', ProductController::class);
         
         Route::get('/orders', [OrderController::class, 'index'])->name('admin.orders.index');
         Route::get('/orders/{order}', [OrderController::class, 'show'])->name('admin.orders.show');
@@ -87,9 +86,12 @@ Route::middleware(['auth', 'verified', 'admin'])
         Route::get('/users', [UserController::class, 'index'])->name('admin.users.index');
         Route::get('/users/{user}', [UserController::class, 'show'])->name('admin.users.show');
         Route::patch('/users/{user}/role', [UserController::class, 'updateRole'])->name('admin.users.updateRole');
-        Route::patch('/users/{user}/status', [UserController::class, 'updateStatus'])->name('admin.users.updateStatus');
-        
+        Route::patch('/users/{user}/status', [UserController::class, 'updateStatus'])->name('admin.users.updateStatus');    
+
+        Route::get('products/trash', [ProductController::class, 'trash'])->name('products.trash');
+        Route::post('products/{id}/restore', [ProductController::class, 'restore'])->name('products.restore');
         Route::post('/products/import', [ProductController::class, 'import'])->name('products.import');
+        Route::resource('products', ProductController::class);
 
         Route::get('reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
         Route::get('reviews/{id}', [AdminReviewController::class, 'show'])->name('reviews.show');

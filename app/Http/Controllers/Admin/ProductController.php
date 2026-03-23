@@ -11,8 +11,8 @@ use App\Models\ProductImage;
 use App\DataTables\ProductDataTable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use App\Imports\ProductsImport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ProductsImport;
 
 class ProductController extends Controller
 {
@@ -35,13 +35,11 @@ class ProductController extends Controller
             'shades.*.hex_code' => 'required',
             'shades.*.price' => 'required|numeric',
             'shades.*.stock' => 'required|integer',
-            'gallery.*' => 'image|mimes:jpeg,png,jpg|max:2048' // Optional: validate gallery files
         ]);
 
         try {
             $product = Product::create($request->only(['name', 'brand_id', 'category_id', 'description', 'finish']));
 
-            // --- NEW: Handle Product Gallery (Multiple Images) ---
             if ($request->hasFile('gallery')) {
                 foreach ($request->file('gallery') as $file) {
                     $path = $file->store('products/gallery', 'public');
@@ -49,7 +47,6 @@ class ProductController extends Controller
                 }
             }
 
-            // --- Handle Shades ---
             if ($request->has('shades')) {
                 foreach ($request->shades as $index => $data) {
                     $shade = new Shade();
@@ -59,18 +56,16 @@ class ProductController extends Controller
                     $shade->price      = $data['price'];
                     $shade->stock      = $data['stock'];
 
-                    // Use the same robust file check as your update method
                     if ($request->hasFile("shades.$index.image")) {
                         $shade->image_path = $request->file("shades.$index.image")->store('products/shades', 'public');
                     }
-                    
                     $shade->save();
                 }
             }
 
             return redirect()->route('products.index')->with('success', 'Product created successfully!');
         } catch (\Exception $e) {
-            return back()->with('error', 'Error creating product: ' . $e->getMessage());
+            return back()->with('error', 'Error: ' . $e->getMessage());
         }
     }
 
@@ -81,33 +76,10 @@ class ProductController extends Controller
         return view('admin.products.edit', compact('product', 'brands', 'categories'));
     }
 
-    public function destroy(Product $product)
-    {
-        try {
-            $hasOrders = \App\Models\OrderItem::whereIn('shade_id', $product->shades->pluck('id'))->exists();
-
-            if ($hasOrders) {
-                return redirect()->route('products.index')
-                    ->with('error', 'Cannot delete: This product has already been ordered by customers.');
-            }
-
-            $product->delete();
-
-            return redirect()->route('products.index')
-                ->with('success', 'Product deleted successfully!');
-
-        } catch (\Illuminate\Database\QueryException $e) {
-            return redirect()->route('products.index')
-                ->with('error', 'Unsuccessful deletion:' . $e->getMessage());
-        }
-    }
-
     public function update(Request $request, Product $product)
     {
-        // 1. Update Main Product Details
         $product->update($request->only(['name', 'brand_id', 'category_id', 'description', 'finish']));
 
-        // 2. Handle Product Gallery (Your working logic)
         if ($request->hasFile('gallery')) {
             foreach ($request->file('gallery') as $file) {
                 $path = $file->store('products/gallery', 'public');
@@ -117,48 +89,30 @@ class ProductController extends Controller
 
         if ($request->has('remove_images')) {
             foreach ($request->remove_images as $imageId) {
-            if (!empty($imageId)) {
                 $img = ProductImage::find($imageId);
-                if ($img && $img->image_path) {
-                    if ($img->image_path !== '/placeholders/product.png') {
-                        Storage::disk('public')->delete($img->image_path);
-                    }
-                $img->delete();
+                if ($img && $img->image_path && $img->image_path !== '/placeholders/product.png') {
+                    Storage::disk('public')->delete($img->image_path);
+                    $img->delete();
                 }
-            }
             }
         }
 
-        // 3. Handle Shades (The problem area)
         $keepShadeIds = [];
         if ($request->has('shades')) {
             foreach ($request->shades as $index => $data) {
-                // Validation: Skip if shade name is missing
                 if (empty($data['shade_name'])) continue;
 
-                // Find existing or create new
                 $shadeId = isset($data['id']) ? (int)$data['id'] : 0;
-                $shade = ($shadeId > 0) 
-                    ? Shade::find($shadeId) 
-                    : new Shade(['product_id' => $product->id]);
+                $shade = ($shadeId > 0) ? Shade::find($shadeId) : new Shade(['product_id' => $product->id]);
 
-                if (!$shade) $shade = new Shade(['product_id' => $product->id]);
-
-                // IMPORTANT: Remove 'image' from $data so fill() doesn't see the file object
                 $shadeData = $data;
                 unset($shadeData['image']); 
                 $shade->fill($shadeData);
 
-                // Handle individual shade image
-                // We use the $index from the loop to target the specific file in the request
                 if ($request->hasFile("shades.$index.image")) {
-                    // Delete old image if it exists
-                    if ($shade->image_path) {
-                        if ($shade->image_path !== '/placeholders/product.png') {
-                            Storage::disk('public')->delete($shade->image_path);
-                        }
+                    if ($shade->image_path && $shade->image_path !== '/placeholders/product.png') {
+                        Storage::disk('public')->delete($shade->image_path);
                     }
-                    // Store the new one
                     $shade->image_path = $request->file("shades.$index.image")->store('products/shades', 'public');
                 }
                 
@@ -167,25 +121,40 @@ class ProductController extends Controller
             }
         }
 
-        // 4. Delete Shades removed from the UI
         $product->shades()->whereNotIn('id', $keepShadeIds)->delete();
 
-        return redirect()->route('products.index')->with('success', 'Product and shades updated successfully!');
+        return redirect()->route('products.index')->with('success', 'Product updated successfully!');
+    }
+
+    public function destroy(Product $product)
+    {
+        // Soft delete: sets deleted_at, hides it from normal queries
+        $product->delete();
+        return redirect()->route('products.index')->with('success', 'Product archived successfully!');
+    }
+
+    public function restore($id)
+    {
+        // Finds even the soft-deleted one
+        $product = Product::withTrashed()->findOrFail($id);
+        $product->restore();
+
+        return redirect()->route('products.index')->with('success', 'Product restored successfully!');
+    }
+
+    public function trash(ProductDataTable $dataTable)
+    {
+        return $dataTable->with(['only_trashed' => true])->render('admin.products.trash');
     }
 
     public function import(Request $request)
     {
-        $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv'
-        ]);
-
+        $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
         try {
-            // ✅ Pass the UploadedFile object directly
             Excel::import(new ProductsImport, $request->file('file'));
-
             return redirect()->back()->with('success', 'Products imported successfully!');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error during import: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Import error: ' . $e->getMessage());
         }
     }
 }
